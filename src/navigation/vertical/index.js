@@ -1,4 +1,5 @@
 import ref from './ref'
+import recipe from './recipe'
 
 export default [
   {
@@ -11,5 +12,5 @@ export default [
     to: { name: 'second-page' },
     icon: { icon: 'mdi-file-document-outline' },
   },
-  ...ref,
+  ...ref,...recipe,
 ]
