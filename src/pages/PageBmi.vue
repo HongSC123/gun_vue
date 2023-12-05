@@ -5,7 +5,7 @@
         <strong>성별정보</strong>
       
         <VRadioGroup
-          v-model="inlineRadio"
+          v-model="gender"
           inline
         >
           <VRadio
@@ -89,11 +89,11 @@
   </div>
 </template>
 
-<script> 
+<script>
 export default {
   data() {
     return {
-      inlineRadio: 'female',
+      gender: 'female',
       height: '',
       weight: '',
       age: '',
@@ -102,11 +102,22 @@ export default {
   },
   methods: {
     calculateBMI() {
+      // 입력 폼이 완전하지 않거나 숫자가 아닌 값이 입력된 경우 알림 창 표시
+      if (!this.height || !this.weight || !this.age || !this.gender || !this.isNumeric(this.height) || !this.isNumeric(this.weight) || !this.isNumeric(this.age)) {
+        alert('성별정보, 키, 몸무게, 나이를 모두 입력하고, 숫자로만 입력해주세요.')
+        
+        return
+      }
+
       const heightInMeters = parseFloat(this.height) / 100
       const weightInKg = parseFloat(this.weight)
       const bmi = weightInKg / (heightInMeters * heightInMeters)
 
       this.calculatedBMI = bmi
+    },
+    isNumeric(value) {
+      // 숫자 여부를 확인하는 함수
+      return /^\d+$/.test(value)
     },
     calculateResult() {
       if (this.calculatedBMI === null) {
@@ -130,6 +141,9 @@ export default {
   },
 }
 </script>
+
+
+
 
 <style scoped>
 .btn {
