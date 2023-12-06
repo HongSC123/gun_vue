@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite --host --port 2222",
-    "build": "vite build --watch --emptyOutDir",
+    "build": "vite build --watch",
     "preview": "vite preview --port 1010",
     "lint": "eslint . -c .eslintrc.js --fix --ext .ts,.js,.vue,.tsx,.jsx",
     "build:icons": "node src/@iconify/build-icons.js",

@@ -3,7 +3,6 @@
 import jinwoo from './jinwoo'
 import recipe from './recipe'
 import ref from './ref'
-import recipe from './recipe'
 
 export default [
   {
