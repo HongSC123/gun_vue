@@ -1,8 +1,9 @@
 
 
+import jinwoo from './jinwoo'
+import recipe from './recipe'
 import ref from './ref'
 import recipe from './recipe'
-
 
 export default [
   {
@@ -18,9 +19,13 @@ export default [
   {
     title: 'BMI 비만도 계산',
     to: { name: 'PageBmi' },
-    icon: { icon: 'mdi-file-document-outline' },
+    icon: { icon: 'mdi-calculator-variant-outline' },
   },
-  ...ref,...recipe,
+  ...jinwoo,
+  ...ref,
+  ...recipe,
+  
+
 ]
 
 
