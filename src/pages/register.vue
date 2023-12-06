@@ -1,39 +1,66 @@
 <script setup>
 import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
-import axios from '@axios'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
-import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
-import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
-import authV2LoginIllustrationDark from '@images/pages/auth-v2-login-illustration-dark.png'
-import authV2LoginIllustrationLight from '@images/pages/auth-v2-login-illustration-light.png'
 import authV2MaskDark from '@images/pages/auth-v2-mask-dark.png'
 import authV2MaskLight from '@images/pages/auth-v2-mask-light.png'
-import tree from '@images/pages/tree.png'
+import authV2RegisterIllustrationBorderedDark from '@images/pages/auth-v2-register-illustration-bordered-dark.png'
+import authV2RegisterIllustrationBorderedLight from '@images/pages/auth-v2-register-illustration-bordered-light.png'
+import authV2RegisterIllustrationDark from '@images/pages/auth-v2-register-illustration-dark.png'
+import authV2RegisterIllustrationLight from '@images/pages/auth-v2-register-illustration-light.png'
+import tree2 from '@images/pages/tree-2.png'
+
+import axios from '@axios'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import {
+  emailValidator,
+  requiredValidator,
+} from '@validators'
+import { VForm } from 'vuetify/components/VForm'
 
+const refVForm = ref()
+const username = ref('johnDoe')
+const email = ref('john@example.com')
+const password = ref('john@MATERIO#123')
+const privacyPolicies = ref(true)
+
+// Router
+const route = useRoute()
 const router = useRouter()
 
-const form = ref({
-  email: '',
-  password: '',
-  remember: false,
+// Ability
+// const ability = useAppAbility()
+
+// Form Errors
+const errors = ref({
+  memEmail: undefined,
+  memPw: undefined,
 })
 
-const isPasswordVisible = ref(false)
-const authThemeImg = useGenerateImageVariant(authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
-const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
-
-
-const loginCheck = () => {
-  axios.post('/login', {
-    memEmail: form.value.email,
-    memPw: form.value.password,
+const register = () => {
+  axios.post('/signup', {
+    memEmail: email.value,
+    memPw: password.value,
   }).then(r => {
-    console.log(r)
+    router.push({ name: 'AccountSettings' })
   }).catch(e => {
-    console.log(e)
+    const { errors: formErrors } = e.response.data
+
+    errors.value = formErrors
+    console.error(e.response.data)
+    if(e.response.data === 'duplicate'){
+      alert('중복된 이메일 입니다.')
+    }
   })
+}
+
+
+const imageVariant = useGenerateImageVariant(authV2RegisterIllustrationLight, authV2RegisterIllustrationDark, authV2RegisterIllustrationBorderedLight, authV2RegisterIllustrationBorderedDark, true)
+const authThemeMask = useGenerateImageVariant(authV2MaskLight, authV2MaskDark)
+const isPasswordVisible = ref(false)
+
+const onSubmit = () => {
+  register()
 }
 </script>
 
@@ -53,31 +80,31 @@ const loginCheck = () => {
       class="auth-wrapper"
     >
       <VCol
-        md="8"
-        class="d-none d-md-flex align-center justify-center position-relative"
+        lg="8"
+        class="d-none d-lg-flex align-center justify-center position-relative"
       >
         <div class="d-flex align-center justify-center w-100 pa-10 pe-0">
           <VImg
             max-width="768px"
-            :src="authThemeImg"
+            :src="imageVariant"
             class="auth-illustration"
           />
         </div>
 
         <VImg
-          :width="276"
-          :src="tree"
+          :width="150"
+          :src="tree2"
           class="auth-footer-start-tree"
         />
+
         <VImg
           class="auth-footer-mask"
           :src="authThemeMask"
         />
       </VCol>
-
       <VCol
         cols="12"
-        md="4"
+        lg="4"
         class="auth-card-v2 d-flex align-center justify-center"
       >
         <VCard
@@ -86,20 +113,25 @@ const loginCheck = () => {
           class="mt-12 mt-sm-0 pa-4"
         >
           <VCardText>
-            <h5 class="text-h5 font-weight-medium mb-1">
-              Welcome to {{ themeConfig.app.title }}! 👋🏻
+            <h5 class="text-h5 mb-1">
+              건강을 부탁해
             </h5>
             <p class="mb-0">
-              Please sign-in to your account and start the adventure
+              회원가입 입니다
             </p>
           </VCardText>
+
           <VCardText>
-            <VForm @submit.prevent="loginCheck">
+            <VForm
+              ref="refVForm"
+              @submit.prevent="onSubmit"
+            >
               <VRow>
                 <!-- email -->
                 <VCol cols="12">
                   <VTextField
-                    v-model="form.email"
+                    v-model="email"
+                    :rules="[requiredValidator, emailValidator]"
                     label="Email"
                     type="email"
                   />
@@ -108,46 +140,57 @@ const loginCheck = () => {
                 <!-- password -->
                 <VCol cols="12">
                   <VTextField
-                    v-model="form.password"
-                    label="Password"
+                    v-model="password"
+                    :rules="[requiredValidator]"
+                    label="비밀번호"
                     :type="isPasswordVisible ? 'text' : 'password'"
                     :append-inner-icon="isPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
                     @click:append-inner="isPasswordVisible = !isPasswordVisible"
                   />
+                </VCol>
 
-                  <div class="d-flex align-center flex-wrap justify-space-between mt-1 mb-4">
+                <VCol cols="12">
+                  <div class="d-flex align-center mt-1 mb-4">
                     <VCheckbox
-                      v-model="form.remember"
-                      label="Remember me"
+                      id="privacy-policy"
+                      v-model="privacyPolicies"
+                      inline
                     />
-                    <a
-                      class="text-primary ms-2 mb-1"
-                      href="#"
+                    <VLabel
+                      for="privacy-policy"
+                      class="pb-1"
+                      style="opacity: 1;"
                     >
-                      Forgot Password?
-                    </a>
+                      <span class="me-1">개인정보 </span>
+                      <a
+                        href="javascript:void(0)"
+                        class="text-primary"
+                      >해외이전 필수 동의</a>
+                    </VLabel>
                   </div>
-
+                 
                   <VBtn
                     block
                     type="submit"
+                    @click="onSubmit"
                   >
-                    Login
+                    회원가입
                   </VBtn>
                 </VCol>
+                
 
                 <!-- create account -->
                 <VCol
                   cols="12"
                   class="text-center text-base"
                 >
-                  <span>New on our platform?</span>
+                  <span>이미 계정이 있으신가요?</span>
                   <RouterLink
                     class="text-primary ms-2"
-                    :to="{ name: 'register' }"
+                    :to="{ name: 'login' }"
                   >
-                    Create an account
-                  </routerlink>
+                    로그인페이지로
+                  </RouterLink>
                 </VCol>
 
                 <VCol

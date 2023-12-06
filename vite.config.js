@@ -59,15 +59,15 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "../gun/src/main/resources/static",
+    outDir: "../new_gun/src/main/resources/static",
   },
   server: {
     proxy: {
-      '/': {
+      '/api': {
         target: 'http://localhost:8888',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      }
+        rewrite: path => path.replace(/^\/api/, ''),
+      },
     },
   },
   optimizeDeps: {
