@@ -1,18 +1,35 @@
-@@ 원본
-
 <template>
-    <div id="chat-container">
-      <div id="chat-messages">
-        <!-- 메시지를 표시할 영역 -->
-        <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.isUserMessage ? 'user-message' : 'ai-message'">
-          {{ msg.sender }} : {{ msg.message }}
-        </div>
-      </div>
-      <div id="user-input">
-        <input type="text" placeholder="레시피를 검색하고 싶은 요리 이름을 적어주세요!" v-model="userMessage" />
-        <button @click="sendMessage">전송</button>
+  <div id="chat-container">
+    <div id="chat-messages">
+      <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.isUserMessage ? 'user-message' : 'ai-message'">
+        {{ msg.sender }}: {{ msg.message }}
       </div>
     </div>
+<<<<<<< Updated upstream
+    <div id="user-input">
+      <input type="text" placeholder="레시피를 검색하고 싶은 요리 이름을 적어주세요!" v-model="userMessage" @keydown.enter="sendMessage" />
+      <button @click="sendMessage">전송</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from 'axios';
+export default {
+  data() {
+    return {
+      userMessage: '',
+      chatHistory: [],
+      apiKey: "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",
+      apiEndpoint: 'https://api.openai.com/v1/chat/completions',
+    };
+  },
+  methods: {
+    handleKeyDown(event) {
+      if (event.key === 'Enter') {
+        this.sendMessage();
+      }
+=======
   </template>
   
     
@@ -24,101 +41,109 @@
       return {
         userMessage: '', // 사용자 입력 메시지를 담을 데이터 속성
         chatHistory: [], // 채팅 기록을 담을 배열
-        apiKey: "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",
+        apiKey: "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",
         apiEndpoint: 'https://api.openai.com/v1/chat/completions',
       };
+>>>>>>> Stashed changes
     },
-    methods: {
-      handleKeyDown(event) {
-        if (event.key === 'Enter') {
-          this.sendMessage();
-        }
-      },
-      async addMessage(sender, message, isUserMessage) {
-        // 메시지를 채팅 기록에 추가하는 메서드
-        this.chatHistory.unshift({ sender, message, isUserMessage });
-      },
-      async fetchAIResponse(prompt) {
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.apiKey}`
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: prompt }],
-            temperature: 0.2,
-            max_tokens: 1000,
-            top_p: 1,
-            frequency_penalty: 0.5,
-            presence_penalty: 0.5,
-            stop: ["Human", "하지만"],
-          }),
-        };
-        
-  
-        try {
-          const response = await fetch(this.apiEndpoint, requestOptions);
-          const data = await response.json();
+    async addMessage(sender, message, isUserMessage) {
+      this.chatHistory.unshift({ sender, message, isUserMessage });
+    },
+    async fetchAIResponse(prompt) {
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [{ role: "user", content: prompt }],
+          temperature: 0.2,
+          max_tokens: 1000,
+          top_p: 1,
+          frequency_penalty: 0.5,
+          presence_penalty: 0.5,
+          stop: ["Human", "하지만"],
+        }),
+      };
+      
+
+      try {
+    const response = await fetch(this.apiEndpoint, requestOptions);
+    // console.log('API 응답:', response); // 응답 확인용 로그
+    const data = await response.json();
+    // console.log('API 응답 데이터:', data); // 응답 데이터 확인용 로그
+
+        if (data && Array.isArray(data.choices) && data.choices.length > 0 && data.choices[0].message && data.choices[0].message.content) {
           const aiResponse = data.choices[0].message.content;
           return aiResponse;
-        } catch (error) {
-          console.error('OpenAI API 호출 중 오류 발생:', error);
-          return 'OpenAI API 호출 중 오류 발생';
-        }
-      },
-      async sendMessage() {
-        let message = this.userMessage.trim();
-  
-        if (message.length === 0) return;
-  
-        const isRecipeRelated = /레시피|요리법/.test(message) || /^[가-힣\s]+$/.test(message);
-  
-        if (isRecipeRelated) {
-          // this.addMessage('나', message, true);
-          this.userMessage = '';
-  
-          if (!/레시피|요리법/.test(message)) {
-            const searchKeyword = message + ' 계량까지 한 레시피와 1인분 열량을 알려줘';
-            this.chatHistory.unshift({ sender: '나', content: searchKeyword, message : message, isUserMessage: true });
-            message = searchKeyword;
-          }
-  
-          const aiResponse = await this.fetchAIResponse(message);
-          this.addMessage('라따뚜AI', aiResponse, false);
-  
-           // 숫자를 포함하는지 확인
-          if (aiResponse.match(/\d+/)) {
-        // 데이터를 Java 백엔드로 전송
-        try {
-          const response = await axios.post('http://localhost:8888/chat', {
-            data: aiResponse // 전송할 데이터
-          });
-          console.log('Data sent to Java backend:', response.data);
-        } catch (error) {
-          console.error('Error sending data to Java backend:', error);
-        }
-      }
         } else {
-          this.addMessage('나', message, true);
-          this.addMessage('라따뚜AI', '죄송합니다. 레시피 관련 질문이나 음식 이름이 아닌 경우, 한글로 검색하지 않으신 경우엔 답변드리지 못합니다.', false);
+          throw new Error('Invalid or empty API response');
         }
+      } catch (error) {
+        console.error('OpenAI API 호출 중 오류 발생:', error);
+        return 'OpenAI API 호출 중 오류 발생';
+      }
+    },
+    async sendMessage() {
+      let message = this.userMessage.trim();
+
+      if (message.length === 0) return;
+
+      const isRecipeRelated = /레시피|요리법/.test(message) || /^[가-힣\s]+$/.test(message);
+
+      if (isRecipeRelated) {
         this.userMessage = '';
-      },
+
+        if (!/레시피|요리법/.test(message)) {
+          const searchKeyword = message + ' 계량까지 한 레시피와 1인분 열량을 알려줘';
+          this.chatHistory.unshift({ sender: '나', content: searchKeyword, message: message, isUserMessage: true });
+          message = searchKeyword;
+        }
+
+        try {
+          const aiResponse = await this.fetchAIResponse(message);
+
+          if (aiResponse !== 'OpenAI API 호출 중 오류 발생') {
+            this.addMessage('라따뚜AI', aiResponse, false);
+            //백엔드로 전송
+            if (aiResponse.match(/[a-zA-Z]+[0-9]+|[0-9]+[a-zA-Z]+/)) {
+    try {
+        const response = await axios.post('http://localhost:8888/insert', {
+            data: aiResponse // 전송할 데이터
+        });
+        console.log('백엔드로 데이터 전송:', response.data);
+    } catch (error) {
+        console.error('백엔드로 전송 실패:', error);
+    }
+}
+            
+          } else {
+            this.addMessage('나', message, true);
+            this.addMessage('라따뚜AI', '죄송합니다. API 호출 중 오류가 발생했습니다.', false);
+          }
+        } catch (error) {
+          console.error('API 요청 중 오류:', error);
+          this.addMessage('나', message, true);
+          this.addMessage('라따뚜AI', '죄송합니다. API 호출 중 오류가 발생했습니다.', false);
+        }
+      } else {
+        this.addMessage('나', message, true);
+        this.addMessage('라따뚜AI', '죄송합니다. 레시피 관련 질문이나 음식 이름이 아닌 경우, 한글로 검색하지 않으신 경우엔 답변드리지 못합니다.', false);
+      }
+      this.userMessage = '';
     },
-    mounted() {
-      // 초기 화면에 인삿말 추가
-      this.addMessage('라따뚜AI', '안녕하세요! 어떤 레시피를 검색하고 싶으세요? 음식 이름만 말해주시면 조리법과 1인분 열량을 알려드리겠습니다!');
-      // Enter 키 이벤트를 추가합니다.
-      document.addEventListener('keydown', this.handleKeyDown);
-    },
-    beforeUnmount() {
-      // 컴포넌트가 삭제되기 전에 이벤트 리스너를 해제합니다.
-      document.removeEventListener('keydown', this.handleKeyDown);
-    },
-  };
-  </script>
+  },
+  mounted() {
+    this.addMessage('라따뚜AI', '안녕하세요! 어떤 레시피를 검색하고 싶으세요? 음식 이름만 말해주시면 조리법과 1인분 열량을 알려드리겠습니다!');
+    document.addEventListener('keydown', this.handleKeyDown);
+  },
+  beforeUnmount() {
+    document.removeEventListener('keydown', this.handleKeyDown);
+  },
+};
+</script>
     
     <style>
     /* 스타일 영역에 CSS를 추가할 수 있습니다. */
