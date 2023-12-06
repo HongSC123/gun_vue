@@ -1,3 +1,9 @@
+
+
+import ref from './ref'
+import recipe from './recipe'
+
+
 export default [
   {
     title: 'Home',
@@ -9,4 +15,12 @@ export default [
     to: { name: 'second-page' },
     icon: { icon: 'mdi-file-document-outline' },
   },
+  {
+    title: 'BMI 비만도 계산',
+    to: { name: 'PageBmi' },
+    icon: { icon: 'mdi-file-document-outline' },
+  },
+  ...ref,...recipe,
 ]
+
+

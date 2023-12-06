@@ -1,8 +1,9 @@
 import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
 import routes from '~pages'
-import sun from './sun'
 
+import jinwoo from './jinwoo'
+import sun from './sun'
 
 
 const router = createRouter({
@@ -11,6 +12,7 @@ const router = createRouter({
     ...setupLayouts(routes),
     ...sun,
   ],
+  ...jinwoo,
 })
 
 
