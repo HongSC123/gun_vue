@@ -5,7 +5,7 @@ export default [
       icon: { icon: 'mdi-chart-donut' },
       children: [
         { title: '검색봇', to: 'recipe-chatRecipe' },
-        // { title: '지난 답변', to: 'recipe-chatRecent' },
+        { title: '지난 답변', to: 'recipe-chatRecent' },
         // { title: '고정 답변', to: 'recipe-chatFixed' },
       ],
     },

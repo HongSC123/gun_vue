@@ -5,6 +5,7 @@
         {{ msg.sender }}: {{ msg.message }}
       </div>
     </div>
+<<<<<<< Updated upstream
     <div id="user-input">
       <input type="text" placeholder="레시피를 검색하고 싶은 요리 이름을 적어주세요!" v-model="userMessage" @keydown.enter="sendMessage" />
       <button @click="sendMessage">전송</button>
@@ -28,6 +29,22 @@ export default {
       if (event.key === 'Enter') {
         this.sendMessage();
       }
+=======
+  </template>
+  
+    
+  <script>
+  import axios from 'axios';
+  
+  export default {
+    data() {
+      return {
+        userMessage: '', // 사용자 입력 메시지를 담을 데이터 속성
+        chatHistory: [], // 채팅 기록을 담을 배열
+        apiKey: "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",
+        apiEndpoint: 'https://api.openai.com/v1/chat/completions',
+      };
+>>>>>>> Stashed changes
     },
     async addMessage(sender, message, isUserMessage) {
       this.chatHistory.unshift({ sender, message, isUserMessage });
