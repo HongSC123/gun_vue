@@ -59,7 +59,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "../new_gun/src/main/resources/static",
+    outDir: "../gun/src/main/resources/static",
   },
   server: {
     proxy: {
