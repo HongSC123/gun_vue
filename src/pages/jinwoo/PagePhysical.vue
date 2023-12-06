@@ -6,8 +6,9 @@
       <VRow>
         <!-- 정면 -->
         <VCol
-          md="6"
+          md="4"
           cols="12"
+          offset-sm="2"
         >
           <VCardText>
             정면
@@ -21,8 +22,9 @@
         </VCol>
         <!-- 측면 -->
         <VCol
-          md="6"
+          md="4"
           cols="12"
+          offset-sm="2"
         >
           <VCardText>
             측면
@@ -36,22 +38,26 @@
         </VCol>
       </VRow>
       <VDivider />
-      <VCard title="측정하기 📷" /> 
-      <VRow>
-        <VCol
-          class="d-flex justify-center"
-          cols="12"
-          sm="6"
-        >
-          <VBtn block>
-            측정하기
-            <VIcon
-              end
-              icon="mdi-camera-outline"
-            />
-          </VBtn>
-        </VCol>
-      </VRow>
+      <VCol
+        class="d-flex justify-center"
+        cols="12"
+        sm="8"
+        offset-sm="2"
+      >
+        <VBtn block>
+          측정하기
+          <VIcon
+            end
+            icon="mdi-camera-outline"
+          />
+        </VBtn>
+      </VCol>
     </vcard>
   </div>
 </template>
+
+<script>
+export default {
+ 
+}
+</script>
