@@ -1,5 +1,16 @@
 <script setup>
+import axios from '@axios'
 import avatar1 from '@images/avatars/avatar-1.png'
+
+const logout = () => {
+  axios.post("/logout", {
+    accessToken: sessionStorage.getItem("token"),
+  }).then(r => {
+    sessionStorage.removeItem("token")
+    router.push("/")
+    console.log("로그아웃 성공")
+  })
+}
 </script>
 
 <template>
@@ -107,19 +118,31 @@ import avatar1 from '@images/avatars/avatar-1.png'
 
           <!-- Divider -->
           <VDivider class="my-2" />
-
-          <!-- 👉 Logout -->
-          <VListItem to="/login">
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="mdi-logout"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Logout</VListItemTitle>
-          </VListItem>
+          <div>
+            <!-- 👉 Logout -->
+            <VListItem @click="logout">
+              <template #prepend>
+                <VIcon
+                  class="me-2"
+                  icon="mdi-logout"
+                  size="22"
+                />
+              </template>
+            
+              <VListItemTitle>Logout</VListItemTitle>
+            </VListItem>
+            <!-- 👉 Login -->
+            <VListItem to="/login">
+              <template #prepend>
+                <VIcon
+                  class="me-2"
+                  icon="mdi-login"
+                  size="22"
+                />
+              </template>
+              <VListItemTitle>Login</VListItemTitle>
+            </VListItem>
+          </div>
         </VList>
       </VMenu>
       <!-- !SECTION -->

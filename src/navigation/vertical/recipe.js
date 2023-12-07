@@ -1,4 +1,5 @@
 export default [
+
     { heading: '레시피 검색' },
     {
       title: '레시피 검색',

@@ -30,7 +30,19 @@ const loginCheck = () => {
     memEmail: form.value.email,
     memPw: form.value.password,
   }).then(r => {
-    console.log(r)
+    // console.log("r :", r)
+    // console.log("r.data : " + r.data)
+    // console.log("r.data.accessToken : " + r.data.accessToken)
+    // console.log("r.data.refreshToken : " + r.data.refreshToken)
+    
+    const token = r.data.accessToken
+  
+    console.log("token : " + token)
+
+    sessionStorage.setItem('token', token)
+    router.push("/")
+
+    
   }).catch(e => {
     console.log(e)
   })
