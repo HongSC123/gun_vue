@@ -42,7 +42,9 @@ const register = () => {
     memEmail: email.value,
     memPw: password.value,
   }).then(r => {
+    sessionStorage.setItem('memEmail', email.value)
     router.push({ name: 'AccountSettings' })
+
   }).catch(e => {
     const { errors: formErrors } = e.response.data
 
