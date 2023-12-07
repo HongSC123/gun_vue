@@ -1,3 +1,4 @@
+import MyPhyList from '@/pages/jinwoo/MyPhyList.vue'
 import PageMyPhy from '@/pages/jinwoo/PageMyPhy.vue'
 import PagePhysical from '@/pages/jinwoo/PagePhysical.vue'
 
@@ -17,6 +18,9 @@ const jinwoo = [
         name: 'PageMyPhy',
         component: PageMyPhy,
       },
+      { path: '/myphylist',
+        name: 'MyPhyList',
+        component: MyPhyList },
     ],
   },
 ]
