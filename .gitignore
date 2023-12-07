@@ -32,3 +32,6 @@ dist-ssr
 
 # iconify dist files
 src/@iconify/icons-bundle.js
+
+# chatRecipe.vue 파일을 Git 추적에서 제외
+src/pages/recipe/chatRecipe.vue

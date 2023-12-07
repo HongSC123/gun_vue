@@ -24,7 +24,7 @@
       return {
         userMessage: '', // 사용자 입력 메시지를 담을 데이터 속성
         chatHistory: [], // 채팅 기록을 담을 배열
-        apiKey: "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",
+        apiKey: "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",
         apiEndpoint: 'https://api.openai.com/v1/chat/completions',
       };
     },
@@ -78,10 +78,14 @@
         if (isRecipeRelated) {
           // this.addMessage('나', message, true);
           this.userMessage = '';
+
+          let userQuery = message; // 사용자의 검색어로 할당
+
   
           if (!/레시피|요리법/.test(message)) {
             const searchKeyword = message + ' 계량까지 한 레시피와 1인분 열량을 알려줘';
             this.chatHistory.unshift({ sender: '나', content: searchKeyword, message : message, isUserMessage: true });
+            userQuery = message;
             message = searchKeyword;
           }
   
@@ -92,13 +96,16 @@
           if (aiResponse.match(/\d+/)) {
         // 데이터를 Java 백엔드로 전송
         try {
-          const response = await axios.post('http://localhost:8888/chat', {
-            data: aiResponse // 전송할 데이터
-          });
-          console.log('Data sent to Java backend:', response.data);
-        } catch (error) {
-          console.error('Error sending data to Java backend:', error);
-        }
+          const dataToSend = {
+              chat_title: userQuery,
+              chat_content: aiResponse
+            };
+
+            const response = await axios.post('http://localhost:8888/chatinsert', dataToSend);
+            console.log('Data sent to Java backend:', response.data, dataToSend);
+          } catch (error) {
+            console.error('Error sending data to Java backend:', error);
+          }
       }
         } else {
           this.addMessage('나', message, true);
