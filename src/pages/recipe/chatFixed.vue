@@ -11,7 +11,7 @@
       </v-app-bar>
       <v-main>
         <v-container>
-          <v-row>
+          <v-row justify="center">
             <v-col cols="12" md="4"></v-col>
             <v-col cols="12" md="2">
                 <v-btn @click="movetomain" :style="{ height:'50px', width:'200px', backgroundColor:'cyan', color:'white', fontWeight:'bold', fontSize:'large' }">메인화면으로</v-btn>
@@ -20,7 +20,7 @@
                 <v-btn @click="movetochatrecipe" :style="{ height:'50px', width:'200px', backgroundColor:'cyan', color:'white', fontWeight:'bold', fontSize:'large' }">레시피 검색</v-btn>
             </v-col>
             <v-col cols="12" md="2">
-                <v-btn @click="movetochatfixed" :style="{ height:'50px', width:'200px', backgroundColor:'cyan', color:'white', fontWeight:'bold', fontSize:'large' }">고정 답변</v-btn>
+                <v-btn @click="movetochatrecipe" :style="{ height:'50px', width:'200px', backgroundColor:'cyan', color:'white', fontWeight:'bold', fontSize:'large' }">최근 답변</v-btn>
             </v-col>
             <v-col cols="12" md="2"></v-col>
             <v-col cols="12" md="2">
@@ -35,17 +35,15 @@
                     <td style="width: 200px; background-color: #d437e2; color: #fff3f3;">번호</td>
                     <td style="width: 800px; background-color: #f0f0f0; color: #333;">검색어</td>
                     <td style="width: 400px; background-color: #f0f0f0; color: #333;">작성시간</td>
-                    <td style="width: 200px; background-color: #f0f0f0; color: #333;">고정</td>
+                    <td style="width: 200px; background-color: #f0f0f0; color: #333;">고정해제</td>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="item in contentlist" :key="item.id" @click="movetocontent(item.chat_num)">
-                  <td>{{item.chat_num}}</td>
-                  <td>{{item.chat_title}}</td>
-                  <td>{{item.chat_date}}</td>
-                  <td>{{item.chat_fix}}</td>
-                  <!-- Sequelize의 createdAt, updatedAt의 날짜 형식이 '2021-12-10T12:38:52.000Z' 이런 식이여서 
-                               split('T')[0]을 통해 날짜만 표시 -->
+                    <td v-if="item.chat_fix === 'Y'">{{ item.chat_num }}</td>
+                    <td v-if="item.chat_fix === 'Y'">{{ item.chat_title }}</td>
+                    <td v-if="item.chat_fix === 'Y'">{{ item.chat_date }}</td>
+                    <td v-if="item.chat_fix === 'Y'">{{ item.chat_fix }}</td>
                 </tr>
               </tbody>
             </v-simple-table>
@@ -123,9 +121,9 @@
         // window.location.href를 사용하여 특정 URL('/recipe/chatrecipe')로 이동합니다.
         window.location.href = '/recipe/chatrecipe';
       },
-      movetochatfixed() {
-  // window.location.href를 사용하여 특정 URL('/recipe/chatrecipe')로 이동합니다.
-  window.location.href = '/recipe/chatfixed';
+      movetochatrecent() {
+        // window.location.href를 사용하여 특정 URL('/recipe/chatrecipe')로 이동합니다.
+        window.location.href = '/recipe/chatrecent';
       },
       movetocontent(chat_num) {        // 클릭된 글의 chat_num을 받아와야 라우팅할때 보낼 수 있음
         window.location.href = window.location.pathname + 'content?chat_num=' + chat_num

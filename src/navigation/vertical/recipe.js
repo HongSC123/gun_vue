@@ -6,7 +6,7 @@ export default [
       children: [
         { title: '검색봇', to: 'recipe-chatRecipe' },
         { title: '지난 답변', to: 'recipe-chatRecent' },
-        // { title: '고정 답변', to: 'recipe-chatFixed' },
+        { title: '고정 답변', to: 'recipe-chatFixed' },
       ],
     },
   ]
