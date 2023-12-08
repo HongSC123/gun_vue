@@ -44,7 +44,10 @@
         sm="8"
         offset-sm="2"
       >
-        <VBtn block>
+        <VBtn
+          block
+          variant="tonal"
+        >
           측정하기
           <VIcon
             end
