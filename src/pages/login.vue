@@ -1,6 +1,4 @@
 <script setup>
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
-import axios from '@axios'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
 import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
@@ -11,6 +9,11 @@ import authV2MaskLight from '@images/pages/auth-v2-mask-light.png'
 import tree from '@images/pages/tree.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { useRouter } from 'vue-router'
+import { useKakao } from 'vue3-kakao-sdk'
+import axios from 'e:/gun_workspace/gun_vue/node_modules/axios/index'
+
+const { kakao } = useKakao()
 
 const router = useRouter()
 
@@ -30,22 +33,39 @@ const loginCheck = () => {
     memEmail: form.value.email,
     memPw: form.value.password,
   }).then(r => {
-    // console.log("r :", r)
-    // console.log("r.data : " + r.data)
-    // console.log("r.data.accessToken : " + r.data.accessToken)
-    // console.log("r.data.refreshToken : " + r.data.refreshToken)
     
-    const token = r.data.accessToken
-  
-    console.log("token : " + token)
+    const { accessToken, refreshToken } = r.data
 
-    sessionStorage.setItem('token', token)
+    sessionStorage.setItem('accessToken', accessToken)
+    sessionStorage.setItem('refreshToken', refreshToken)
+
+    // axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
+
+    // console.log(axios.defaults.headers.common['Authorization'])
     router.push("/")
-
     
   }).catch(e => {
     console.log(e)
   })
+}
+
+const kakaoLogin = () => {
+  console.log("카카오 로그인 누름")
+  kakao.value.Auth.login({
+    success(success){
+      console.log(success)
+    },
+    fail(err){
+      console.log(err)
+    },
+  })
+  
+  // const REST_API_KEY = '91cca4943b511ffba9753bd012ae1c9f'
+  // const REDIRECT_URI = 'http://localhost:8888/login/kakao/'
+
+  // window.location.replace('https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=40c06141ba286e36ef5dc9ec88591ca7&redirect_uri=http://localhost:8888/login/kakao&prompt=select_account')
+
+  // window.location.ref('https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=40c06141ba286e36ef5dc9ec88591ca7&redirect_uri=http://localhost:8888/login/kakao&prompt=select_account')
 }
 </script>
 
@@ -176,7 +196,11 @@ const loginCheck = () => {
                   cols="12"
                   class="text-center"
                 >
-                  <AuthProvider />
+                  <img
+                    src="@images/loginImages/kakao_login_small.png"
+                    alt="카카오로그인"
+                    @click="kakaoLogin"
+                  >
                 </VCol>
               </VRow>
             </VForm>
