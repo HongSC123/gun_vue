@@ -72,6 +72,12 @@ axiosIns.interceptors.response.use(
           console.log("accesstoken : ", response.data.accessToken)
           console.log("refreshToken : ", response.data.refreshToken)
 
+          if(response.data.error != null){
+            console.log("error", response.data.error)
+            
+            return Promise.reject(refreshError)
+          }
+
           if(error.response.status === 701){
             sessionStorage.setItem('accessToken', response.data.accessToken)
           }else if(error.response.status === 702){

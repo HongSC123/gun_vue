@@ -38,10 +38,8 @@ const loginCheck = () => {
 
     sessionStorage.setItem('accessToken', accessToken)
     sessionStorage.setItem('refreshToken', refreshToken)
+    sessionStorage.setItem('loginType', 'member')
 
-    // axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`
-
-    // console.log(axios.defaults.headers.common['Authorization'])
     router.push("/")
     
   }).catch(e => {
@@ -54,18 +52,63 @@ const kakaoLogin = () => {
   kakao.value.Auth.login({
     success(success){
       console.log(success)
+      console.log(success.access_token)
+      console.log(success.refresh_token)
+
+      const accessToken = success.access_token
+      const apiUrl = 'https://kapi.kakao.com/v2/user/me'
+
+      // 카카오 API를 호출하여 사용자 정보 및 이메일 가져오기
+      axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          property_keys: ['kakao_account.email'], // 이메일 정보를 가져오기 위한 요청
+        },
+      })
+        .then(response => {
+          const email = response.data.kakao_account.email
+
+          console.log('사용자 이메일:', email)
+
+          const kakaoInfo = {
+            accessToken: accessToken,
+            refreshToken: success.refresh_token,
+            memEmail: email,
+          }
+
+          performKakaoLogin(kakaoInfo)
+        })
+        .catch(error => {
+          console.error('이메일 가져오기 실패:', error.response.data)
+        })
     },
     fail(err){
       console.log(err)
     },
   })
-  
-  // const REST_API_KEY = '91cca4943b511ffba9753bd012ae1c9f'
-  // const REDIRECT_URI = 'http://localhost:8888/login/kakao/'
+}
 
-  // window.location.replace('https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=40c06141ba286e36ef5dc9ec88591ca7&redirect_uri=http://localhost:8888/login/kakao&prompt=select_account')
+const performKakaoLogin = kakaoInfo => {
+  axios.post('/loginkakao', kakaoInfo, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => {
+      console.log("Response from server:", response)
 
-  // window.location.ref('https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=40c06141ba286e36ef5dc9ec88591ca7&redirect_uri=http://localhost:8888/login/kakao&prompt=select_account')
+      const { accessToken, refreshToken } = response.data
+
+      sessionStorage.setItem('accessToken', accessToken)
+      sessionStorage.setItem('refreshToken', refreshToken)
+      sessionStorage.setItem('loginType', 'kakao')
+      router.push("/")
+    })
+    .catch(error => {
+      console.error('로그인:', error)
+    })
 }
 </script>
 
