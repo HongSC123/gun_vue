@@ -1,6 +1,44 @@
-@@ 원본
-
 <template>
+      <v-container>
+     <v-row justify="center">
+            <VBtn
+              color="primary"
+              variant="tonal"
+              :to="{path: '/'}"
+              class="mr-3"
+            >
+              메인화면으로
+              <VIcon
+                end
+                icon="mdi-home"
+              />
+            </VBtn>
+            <VBtn
+              color="secondary"
+              variant="tonal"
+              :to="{path: 'chatrecent'}"
+              class="mr-3"
+            >
+              최근 답변
+              <VIcon
+                end
+                icon="mdi-history"
+              />
+            </VBtn>
+            <VBtn
+              color="info"
+              variant="tonal"
+              :to="{path: 'chatfixed'}"
+              class="mr-3"
+            >
+              고정 답변
+              <VIcon
+                end
+                icon="mdi-heart"
+              />
+            </VBtn>
+          </v-row>
+        </v-container>
     <div id="chat-container">
       <div id="chat-messages">
         <!-- 메시지를 표시할 영역 -->
@@ -24,7 +62,7 @@
       return {
         userMessage: '', // 사용자 입력 메시지를 담을 데이터 속성
         chatHistory: [], // 채팅 기록을 담을 배열
-        apiKey: "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",
+        apiKey: "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",
         apiEndpoint: 'https://api.openai.com/v1/chat/completions',
       };
     },
@@ -148,7 +186,7 @@
       display: flex;
       flex-direction: column;
       border: 1px solid #ccc;
-      background-image: url('../../assets/images/bg3.jpeg');
+      background-image: url('../../assets/images/bg.jpeg');
       background-size: cover; /* 배경 이미지를 요소에 맞게 조절 */
       background-position: center; /* 배경 이미지의 위치를 가운데로 정렬 */
       /* 다른 배경 속성들을 추가할 수 있음 */

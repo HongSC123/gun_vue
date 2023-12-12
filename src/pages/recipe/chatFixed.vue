@@ -3,7 +3,7 @@
       <v-app-bar app color="red" dark>
         <v-spacer></v-spacer>
         <v-app-bar-title>
-          <div align="center" :style="{fontSize: 'xx-large', fontFamily: 'Comic Sans MS'} ">최근 답변 {{$route.params.id}}</div>
+          <div align="center" :style="{fontSize: 'xx-large', fontFamily: 'Comic Sans MS'} ">고정 답변 {{$route.params.id}}</div>
           <!-- params를 받아올 때는 $route.params.id, 
                   query를 받아올 때는 $route.query.id 이런 형식으로 받아옴 -->
         </v-app-bar-title>
@@ -12,30 +12,51 @@
       <v-main>
         <v-container>
           <v-row justify="center">
-            <v-col cols="12" md="4"></v-col>
-            <v-col cols="12" md="2">
-                <v-btn @click="movetomain" :style="{ height:'50px', width:'200px', backgroundColor:'cyan', color:'white', fontWeight:'bold', fontSize:'large' }">메인화면으로</v-btn>
-            </v-col>
-            <v-col cols="12" md="2">
-                <v-btn @click="movetochatrecipe" :style="{ height:'50px', width:'200px', backgroundColor:'cyan', color:'white', fontWeight:'bold', fontSize:'large' }">레시피 검색</v-btn>
-            </v-col>
-            <v-col cols="12" md="2">
-                <v-btn @click="movetochatrecipe" :style="{ height:'50px', width:'200px', backgroundColor:'cyan', color:'white', fontWeight:'bold', fontSize:'large' }">최근 답변</v-btn>
-            </v-col>
-            <v-col cols="12" md="2"></v-col>
-            <v-col cols="12" md="2">
-              <div :style="{fontSize:'large', marginTop: '7px'}">글갯수 : {{cnt}}개</div>
-              <!-- 현재 게시판 총 글갯수 = cnt -->
-            </v-col>
+            <VBtn
+              color="primary"
+              variant="tonal"
+              :to="{path: '/'}"
+              class="mr-3"
+            >
+              메인화면으로
+              <VIcon
+                end
+                icon="mdi-home"
+              />
+            </VBtn>
+            <VBtn
+              color="success"
+              variant="tonal"
+              :to="{path: 'chatrecipe'}"
+              class="mr-3"
+            >
+              레시피 검색
+              <VIcon
+                end
+                icon="mdi-magnify-plus"
+              />
+            </VBtn>
+            <VBtn
+              color="secondary"
+              variant="tonal"
+              :to="{path: 'chatrecent'}"
+              class="mr-3"
+            >
+              최근 답변
+              <VIcon
+                end
+                icon="mdi-history"
+              />
+            </VBtn>
           </v-row>
           <v-row>
             <v-simple-table style="width: 1500px">
               <thead>
                 <tr style="font-weight: bolder;">
                     <td style="width: 200px; background-color: #d437e2; color: #fff3f3;">번호</td>
-                    <td style="width: 800px; background-color: #f0f0f0; color: #333;">검색어</td>
-                    <td style="width: 400px; background-color: #f0f0f0; color: #333;">작성시간</td>
-                    <td style="width: 200px; background-color: #f0f0f0; color: #333;">고정해제</td>
+                    <td style="width: 800px; background-color: #d437e2; color: #fff3f3;">검색어</td>
+                    <td style="width: 400px; background-color: #d437e2; color: #fff3f3;">작성시간</td>
+                    <td style="width: 200px; background-color: #d437e2; color: #fff3f3;">고정해제</td>
                 </tr>
               </thead>
               <tbody>
@@ -43,26 +64,42 @@
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_num }}</td>
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_title }}</td>
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_date }}</td>
-                    <td v-if="item.chat_fix === 'Y'">{{ item.chat_fix }}</td>
+                    <td v-if="item.chat_fix === 'Y'" @click="toggleChatFixStatus(item)">
+                      <v-btn @click.stop="toggleChatFixStatus(item)" icon>
+                        <v-icon>{{ item.chat_fix === 'Y' ? 'mdi-done' : 'mdi-clear' }}</v-icon>
+                      </v-btn>
+                    </td>
                 </tr>
               </tbody>
             </v-simple-table>
           </v-row>
           <v-row style="padding-top: 20px;">
             <v-spacer/>
-            <v-btn width="10px" @click="movetopreviouspage">      <!-- 이전페이지로 이동 -->
+            <v-btn width="10px" @click="movetopreviouspage"> <!-- 이전페이지로 이동 -->
               <v-icon color="red" large> mdi-arrow-left-bold-outline </v-icon>
-            </v-btn>
-            <div style="margin-top: 5px; margin-right: 10px; margin-left: 10px;">
-              {{$route.query.page}}/{{totalpage}} page</div>
-            <!-- 위와 같이 해줌으로서 '현재페이지/총페이지 page' 식으로 나타냄 -->  
-            <v-btn width="10px" @click="movetonextpage">      <!-- 다음페이지로 이동 -->
+            </v-btn><br>
+
+            <!-- 페이지 버튼 표시 -->
+            <div v-for="(page, index) in totalpage" :key="page">
+              <span v-if="shouldDisplayPage(page)" class="page-number" @click="moveToPage(page)">
+                {{ page }}
+              </span>
+              <span v-if="shouldDisplayPage(page) && index !== totalpage.length - 1" class="space-between"></span>
+            </div>
+
+            <!-- 페이지 정보 표시 -->
+            <!-- <div style="display: flex; align-items: center;">
+              <div style="margin-top: 5px; margin-right: 10px; margin-left: 10px;">
+                {{ currentPage }} / {{ totalpage }} page 
+              </div>
+            </div> -->
+
+            <v-btn width="10px" @click="movetonextpage"> <!-- 다음페이지로 이동 -->
               <v-icon color="red" large> mdi-arrow-right-bold-outline </v-icon>
             </v-btn>
             <v-spacer/>
           </v-row>
         </v-container>
-  
       </v-main>
     </v-app>
   </template>
@@ -71,20 +108,29 @@
   import axios from 'axios'; // backend와 axios 통신을 위해 필요
   
   export default {
-    data(){
-      return {
-        contentlist: [],		// 현재 게시판과 페이지에 맞는 글 리스트들
-        cnt: 0,			// 현재 게시판의 총 글 개수
-      }
+    data() {
+  return {
+    contentlist: [], // 현재 게시판과 페이지에 맞는 글 리스트들
+    cnt: 0, // 현재 게시판의 총 글 개수
+    currentPage: 1, // 현재 페이지 번호
+    itemsPerPage: 10, // 페이지 당 아이템 수
+  };
     },
-    computed: {            	// computed는 계산 목적으로 사용된다고 보면 됨
-      totalpage(){
-        if(this.cnt == 0) {	// 현재 게시판 글 갯수가 0개일때 총 페이지가 0이 되는거 방지
+    computed: {
+  totalpage() {
+        // 총 페이지 수 계산
+        if (this.cnt === 0) {
           return 1;
-        }else {
-          return Math.ceil(this.cnt/10);    // (글 갯수/10)한 후 올림 연산을 통해 총 페이지 계산
+        } else {
+          return Math.ceil(this.cnt / this.itemsPerPage);
         }
-      }
+      },
+      paginatedList() {
+        // 현재 페이지에 따라 contentlist를 필터링하여 반환
+        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+          const endIndex = startIndex + this.itemsPerPage;
+          return this.contentlist.slice(startIndex, endIndex);
+      },
     },
     mounted() {	// mounted는 페이지가 켜질때 실행됨, 페이지가 켜질때 글 리스트들을 db에서 불러옴
       axios({	
@@ -100,8 +146,8 @@
       }).catch(err => {
         alert(err);
       });
-      axios({		// 현재 게시판 글 개수 가져오기
-        url: "http://localhost:8888/chatcount",
+      axios({		// 고정 답변 게시판 글 개수 가져오기
+        url: "http://localhost:8888/chatycount",
         method: "GET",
         data: {
           boardnum: this.$route.params.id,
@@ -114,6 +160,27 @@
     },
   
     methods: {
+      async toggleChatFixChange(item) {
+      try {
+        const newFixStatus = item.chat_fix === 'Y' ? 'N' : 'Y'; // chat_fix 값을 반전시킴
+        const response = await fetch(`/chatupdate/${item.chat_num}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: newFixStatus // 변경된 상태를 JSON 형태로 전송
+        });
+
+        if (response.ok) {
+          // 서버로부터 응답이 성공적으로 온 경우에만 로컬 데이터를 업데이트합니다.
+          item.chat_fix = newFixStatus; // 상태를 업데이트
+        } else {
+          throw new Error('업데이트 실패');
+        }
+      } catch (error) {
+        console.error('업데이트 에러:', error);
+      }
+    },
       movetomain() {
         window.location.href="/"
       },
@@ -125,26 +192,72 @@
         // window.location.href를 사용하여 특정 URL('/recipe/chatrecipe')로 이동합니다.
         window.location.href = '/recipe/chatrecent';
       },
-      movetocontent(chat_num) {        // 클릭된 글의 chat_num을 받아와야 라우팅할때 보낼 수 있음
-        window.location.href = window.location.pathname + 'content?chat_num=' + chat_num
+      movetocontent(chat_num) {
+        // 클릭된 글의 chat_num을 받아와야 라우팅할 때 보낼 수 있음
+        this.$router.push({ path: '/recipe/chatdetail', query: { chat_num: chat_num } });
       },
-      movetopreviouspage(){
-        if(this.$route.query.page == 1) {
-          alert('첫번째 페이지입니다!');
-        } else {
-          var pp = parseInt(this.$route.query.page) - 1;
-          window.location.href = window.location.pathname + '?page=' + pp
-        }
-      },
-      movetonextpage(){
-        if(this.$route.query.page == Math.ceil(this.cnt/10)) {
-          alert('마지막 페이지입니다!');
-        } else{
-          var pp = parseInt(this.$route.query.page) + 1;
-          window.location.href = window.location.pathname + '?page=' + pp
-        }
-      },
+      movetopreviouspage() {
+    if (this.currentPage > 1) {
+      this.currentPage--; // 현재 페이지 감소
+      this.$router.push({ query: { page: this.currentPage } }); // 페이지 변경
+    } else {
+      alert('첫번째 페이지입니다!');
+    }
+  },
+  movetonextpage() {
+    if (this.currentPage < this.totalpage) {
+      this.currentPage++; // 현재 페이지 증가
+      this.$router.push({ query: { page: this.currentPage } }); // 페이지 변경
+    } else {
+      alert('마지막 페이지입니다!');
+    }
+  },
+  shouldDisplayPage(page) {
+      // 페이지가 너무 많을 경우 일부 페이지만 표시
+      const maxPageItems = 5; // 보여줄 최대 페이지 수
+      const currentPage = this.currentPage;
+      const totalPages = this.totalpage;
+
+      if (totalPages <= maxPageItems) {
+        return true; // 전체 페이지 수가 적으면 모두 표시
+      }
+
+      const halfMax = Math.floor(maxPageItems / 2);
+      const firstPage = Math.max(currentPage - halfMax, 1);
+      const lastPage = Math.min(firstPage + maxPageItems - 1, totalPages);
+
+      return page >= firstPage && page <= lastPage;
     },
+
+    moveToPage(page) {
+    // 페이지 번호를 클릭하면 해당 페이지로 이동
+    this.currentPage = page; // currentPage를 클릭된 페이지로 업데이트
+    this.$router.push({ query: { page: page } }); // 페이지 변경
+  },
+  },
+          async toggleChatFixStatus(item) {
+      if (item.chat_fix === 'Y') {
+        try {
+          const newFixStatus = item.chat_fix === 'Y' ? 'N' : 'Y'; // 'N'과 'Y' 문자열 사용
+          const response = await fetch(`/chatupdate/${item.chat_num}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: newFixStatus // 직접 문자열로 전달
+          });
+
+          if (response.ok) {
+            // 서버로부터 응답이 성공적으로 온 경우에만 로컬 데이터를 업데이트합니다.
+            item.chat_fix = newFixStatus; // 서버에서 받은 값을 그대로 업데이트
+          } else {
+            throw new Error('업데이트 실패');
+          }
+        } catch (error) {
+          console.error('업데이트 에러:', error);
+        }
+      }
+    }
   };
   </script>
   
@@ -153,4 +266,14 @@
     border: 1px solid;
     text-align: center;
   }
+  .page-number {
+  /* 숫자 사이 여백 조절 */
+  margin-left : 5px;
+  margin-right: 5px; /* 원하는 여백값(px)을 설정하세요 */
+}
+.space-between {
+  /* 숫자 사이 여백 스타일 */
+  display: inline-block;
+  width: 10px; /* 여백의 너비 설정 */
+}
   </style>
