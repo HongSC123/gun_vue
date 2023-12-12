@@ -62,7 +62,7 @@
       return {
         userMessage: '', // 사용자 입력 메시지를 담을 데이터 속성
         chatHistory: [], // 채팅 기록을 담을 배열
-        apiKey: "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",
+        apiKey: "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",
         apiEndpoint: 'https://api.openai.com/v1/chat/completions',
       };
     },

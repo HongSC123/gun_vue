@@ -64,8 +64,8 @@
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_num }}</td>
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_title }}</td>
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_date }}</td>
-                    <td v-if="item.chat_fix === 'Y'" @click="toggleChatFixStatus(item)">
-                      <v-btn @click.stop="toggleChatFixStatus(item)" icon>
+                    <td v-if="item.chat_fix === 'Y'" @click="toggleChatFixChange(item)">
+                      <v-btn @click.stop="toggleChatFixChange(item)" icon>
                         <v-icon>{{ item.chat_fix === 'Y' ? 'mdi-done' : 'mdi-clear' }}</v-icon>
                       </v-btn>
                     </td>
@@ -161,26 +161,26 @@
   
     methods: {
       async toggleChatFixChange(item) {
-      try {
-        const newFixStatus = item.chat_fix === 'Y' ? 'N' : 'Y'; // chat_fix 값을 반전시킴
-        const response = await fetch(`/chatupdate/${item.chat_num}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: newFixStatus // 변경된 상태를 JSON 형태로 전송
-        });
+    try {
+      const newFixStatus = item.chat_fix === 'Y' ? 'N' : 'Y'; // chat_fix 값을 반전시킴
+      const response = await fetch(`/chatupdate/${item.chat_num}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: newFixStatus // 변경된 상태를 JSON 형태로 전송
+      });
 
-        if (response.ok) {
-          // 서버로부터 응답이 성공적으로 온 경우에만 로컬 데이터를 업데이트합니다.
-          item.chat_fix = newFixStatus; // 상태를 업데이트
-        } else {
-          throw new Error('업데이트 실패');
-        }
-      } catch (error) {
-        console.error('업데이트 에러:', error);
+      if (response.ok) {
+        // 서버로부터 응답이 성공적으로 온 경우에만 로컬 데이터를 업데이트합니다.
+        item.chat_fix = newFixStatus; // 상태를 업데이트
+      } else {
+        throw new Error('업데이트 실패');
       }
-    },
+    } catch (error) {
+      console.error('업데이트 에러:', error);
+    }
+  },
       movetomain() {
         window.location.href="/"
       },
