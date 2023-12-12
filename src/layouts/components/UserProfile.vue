@@ -3,13 +3,32 @@ import axios from '@axios'
 import avatar1 from '@images/avatars/avatar-1.png'
 
 const logout = () => {
-  axios.post("/logout", {
-    accessToken: sessionStorage.getItem("token"),
-  }).then(r => {
-    sessionStorage.removeItem("token")
-    router.push("/")
-    console.log("로그아웃 성공")
-  })
+  const accessToken = sessionStorage.getItem('accessToken')
+
+  axios.post("/logout", { accessToken })
+    .then(r => {
+      sessionStorage.removeItem('accessToken')
+      sessionStorage.removeItem('refreshToken')
+
+      // 로그아웃 시에 실행할 코드
+      axios.defaults.headers.common['Authorization'] = 'logout'
+      
+      console.log(axios.defaults.headers.common['Authorization'])
+
+      // console.log("response", r)
+
+      // console.log("로그아웃 성공")
+    })
+}
+
+const tokenCheck = () => {
+  axios.post("/tokencheck")
+    .then(r=>{
+      console.log("response", r)
+    })
+    .catch(e=>{
+      console.log("error", e)
+    })
 }
 </script>
 
@@ -141,6 +160,17 @@ const logout = () => {
                 />
               </template>
               <VListItemTitle>Login</VListItemTitle>
+            </VListItem>
+            <!-- 👉 token check -->
+            <VListItem @click="tokenCheck">
+              <template #prepend>
+                <VIcon
+                  class="me-2"
+                  icon="mdi-login"
+                  size="22"
+                />
+              </template>
+              <VListItemTitle>token</VListItemTitle>
             </VListItem>
           </div>
         </VList>

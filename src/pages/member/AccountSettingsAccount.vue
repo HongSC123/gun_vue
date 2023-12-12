@@ -2,7 +2,9 @@
 import axios from '@axios'
 import avatar1 from '@images/avatars/avatar-1.png'
 import { onBeforeMount } from 'vue'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const date = ref('')
 
 const memEmail = sessionStorage.getItem('memEmail')
@@ -79,6 +81,9 @@ const optionSave = async () => {
     })
 
     console.log(response.data)
+
+    router.push("/")
+
   } catch (error) {
     console.error(error)
   }
@@ -214,7 +219,7 @@ onBeforeMount(() => {
                 class="d-flex flex-wrap gap-4"
               >
                 <VBtn @click="optionSave">
-                  Save changes
+                  저장하기
                 </VBtn>
 
                 <VBtn
