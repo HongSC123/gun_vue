@@ -1,5 +1,35 @@
 <script setup>
+import axios from '@axios'
 import avatar1 from '@images/avatars/avatar-1.png'
+
+const logout = () => {
+  const accessToken = sessionStorage.getItem('accessToken')
+
+  axios.post("/logout", { accessToken })
+    .then(r => {
+      sessionStorage.removeItem('accessToken')
+      sessionStorage.removeItem('refreshToken')
+
+      // 로그아웃 시에 실행할 코드
+      axios.defaults.headers.common['Authorization'] = 'logout'
+      
+      console.log(axios.defaults.headers.common['Authorization'])
+
+      // console.log("response", r)
+
+      // console.log("로그아웃 성공")
+    })
+}
+
+const tokenCheck = () => {
+  axios.post("/tokencheck")
+    .then(r=>{
+      console.log("response", r)
+    })
+    .catch(e=>{
+      console.log("error", e)
+    })
+}
 </script>
 
 <template>
@@ -107,19 +137,42 @@ import avatar1 from '@images/avatars/avatar-1.png'
 
           <!-- Divider -->
           <VDivider class="my-2" />
-
-          <!-- 👉 Logout -->
-          <VListItem to="/login">
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="mdi-logout"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Logout</VListItemTitle>
-          </VListItem>
+          <div>
+            <!-- 👉 Logout -->
+            <VListItem @click="logout">
+              <template #prepend>
+                <VIcon
+                  class="me-2"
+                  icon="mdi-logout"
+                  size="22"
+                />
+              </template>
+            
+              <VListItemTitle>Logout</VListItemTitle>
+            </VListItem>
+            <!-- 👉 Login -->
+            <VListItem to="/login">
+              <template #prepend>
+                <VIcon
+                  class="me-2"
+                  icon="mdi-login"
+                  size="22"
+                />
+              </template>
+              <VListItemTitle>Login</VListItemTitle>
+            </VListItem>
+            <!-- 👉 token check -->
+            <VListItem @click="tokenCheck">
+              <template #prepend>
+                <VIcon
+                  class="me-2"
+                  icon="mdi-login"
+                  size="22"
+                />
+              </template>
+              <VListItemTitle>token</VListItemTitle>
+            </VListItem>
+          </div>
         </VList>
       </VMenu>
       <!-- !SECTION -->

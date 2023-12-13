@@ -1,15 +1,32 @@
 <script setup>
+import axios from '@axios'
 import avatar1 from '@images/avatars/avatar-1.png'
+import { onBeforeMount } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const date = ref('')
+
+const memEmail = sessionStorage.getItem('memEmail')
 
 const accountData = {
-  avatarImg: avatar1,
-  firstName: 'john',
-  lastName: 'Doe',
-  email: 'johnDoe@example.com',
-  org: 'ThemeSelection',
-  phone: '+1 (917) 543-9876',
-  address: '123 Main St, New York, NY 10001',
-  state: 'New York',
+  memPhoto: avatar1,
+  memGen: 'M',
+  memWeight: 0,
+  memHeight: 0,
+  memBir: '1990-01-01',
+  memActLevel: '일반',
+}
+
+function dataURItoBlob(dataURI) {
+  const byteString = atob(dataURI.split(',')[1])
+  const ab = new ArrayBuffer(byteString.length)
+  const ia = new Uint8Array(ab)
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i)
+  }
+  
+  return new Blob([ab], { type: 'image/png' })
 }
 
 const refInputEl = ref()
@@ -27,19 +44,54 @@ const changeAvatar = file => {
     fileReader.readAsDataURL(files[0])
     fileReader.onload = () => {
       if (typeof fileReader.result === 'string')
-        accountDataLocal.value.avatarImg = fileReader.result
+        accountDataLocal.value.memPhoto = fileReader.result
     }
   }
 }
 
 // reset avatar image
 const resetAvatar = () => {
-  accountDataLocal.value.avatarImg = accountData.avatarImg
+  accountDataLocal.value.memPhoto = accountData.memPhoto
 }
 
 const next = () => {
   router.push("/login")
 }
+
+const optionSave = async () => {
+  const formData = new FormData()
+
+  const memPhotoFile = dataURItoBlob(accountDataLocal.value.memPhoto)
+
+  formData.append('memPhoto', memPhotoFile, 'avatar.png')
+  formData.append('memGen', accountDataLocal.value.memGen)
+  formData.append('memWeight', accountDataLocal.value.memWeight)
+  formData.append('memHeight', accountDataLocal.value.memHeight)
+  formData.append('memBir', accountDataLocal.value.memBir)
+  formData.append('memActLevel', accountDataLocal.value.memActLevel)
+  formData.append('memEmail', memEmail)
+
+  sessionStorage.removeItem('memEmail')
+
+  try {
+    const response = await axios.post('/memoption', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    console.log(response.data)
+
+    router.push("/")
+
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onBeforeMount(() => {
+  sessionStorage.removeItem('memEmail')
+})
 </script>
 
 <template>
@@ -52,7 +104,7 @@ const next = () => {
             rounded="sm"
             size="120"
             class="me-6"
-            :image="accountDataLocal.avatarImg"
+            :image="accountDataLocal.memPhoto"
           />
 
           <!-- 👉 Upload Photo -->
@@ -102,70 +154,63 @@ const next = () => {
           <!-- 👉 Form -->
           <VForm class="mt-6">
             <VRow>
-              <!-- 👉 First Name -->
+              <!-- 👉 memGen -->
               <VCol
                 md="6"
                 cols="12"
               >
-                <VTextField
-                  v-model="accountDataLocal.firstName"
-                  label="First Name"
+                <VSelect
+                  v-model="accountDataLocal.memGen"
+                  clearable
+                  label="성별"
+                  :items="['남자', '여자']"
                 />
               </VCol>
 
-              <!-- 👉 Last Name -->
+              <!-- 👉 memWeight -->
               <VCol
                 md="6"
                 cols="12"
               >
                 <VTextField
-                  v-model="accountDataLocal.lastName"
-                  label="Last Name"
+                  v-model="accountDataLocal.memWeight"
+                  label="몸무게"
+                  type="number"
                 />
               </VCol>
 
-              <!-- 👉 Email -->
+              <!-- 👉 memHeight -->
               <VCol
                 cols="12"
                 md="6"
               >
                 <VTextField
-                  v-model="accountDataLocal.email"
-                  label="E-mail"
-                  type="email"
+                  v-model="accountDataLocal.memHeight"
+                  label="키"
+                  type="number"
                 />
               </VCol>
 
-              <!-- 👉 Organization -->
+              <!-- 👉 memBir -->
               <VCol
                 cols="12"
                 md="6"
               >
-                <VTextField
-                  v-model="accountDataLocal.org"
-                  label="Organization"
+                <AppDateTimePicker
+                  v-model="accountDataLocal.memBir"
+                  label="생년월일"
                 />
               </VCol>
 
-              <!-- 👉 Phone -->
+              <!-- 👉 memActLevel -->
               <VCol
                 cols="12"
                 md="6"
               >
-                <VTextField
-                  v-model="accountDataLocal.phone"
-                  label="Phone Number"
-                />
-              </VCol>
-
-              <!-- 👉 Address -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.address"
-                  label="Address"
+                <VSelect
+                  variant="활동량"
+                  label="활동량"
+                  :items="['비 활동적', '일반/보통','활동적','매우 활동적']"
                 />
               </VCol>
               <!-- 👉 Form Actions -->
@@ -173,7 +218,9 @@ const next = () => {
                 cols="12"
                 class="d-flex flex-wrap gap-4"
               >
-                <VBtn>Save changes</VBtn>
+                <VBtn @click="optionSave">
+                  저장하기
+                </VBtn>
 
                 <VBtn
                   color="secondary"

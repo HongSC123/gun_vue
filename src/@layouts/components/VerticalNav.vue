@@ -94,7 +94,7 @@ const handleNavScroll = evt => {
         >
           <!-- 사이드바 헤더 -->
           <VNodeRenderer :nodes="config.app.logo" />
-
+         
           <Transition name="vertical-nav-app-title">
             <h1
               v-show="!hideTitleAndIcon"

@@ -44,20 +44,66 @@
         sm="8"
         offset-sm="2"
       >
-        <VBtn block>
-          측정하기
-          <VIcon
-            end
-            icon="mdi-camera-outline"
-          />
-        </VBtn>
+        <VCardText>
+          1장씩 업로드 해주세요.
+        </VCardText>
+        <VFileInput
+          show-size
+          label="사진 올리기"
+          variant="underlined"
+          @change="onFileInputChange"
+        />
       </VCol>
     </vcard>
   </div>
 </template>
 
-<script>
-export default {
- 
+<script setup>
+import axios from 'e:/gun_workspace/gun_vue/node_modules/axios/index'
+
+let sequence = 1 // 전역 변수로 시퀀스를 초기화
+
+function dataURItoBlob(dataURI) {
+  const byteString = atob(dataURI.split(',')[1])
+  const ab = new ArrayBuffer(byteString.length)
+  const ia = new Uint8Array(ab)
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i)
+  }
+
+  return new Blob([ab], { type: 'image/png' })
+}
+
+const changePhoto = file => {
+  const fileReader = new FileReader()
+  const { files } = file
+  if (files && files.length) {
+    fileReader.readAsDataURL(files[0])
+    fileReader.onload = () => {
+      if (typeof fileReader.result === 'string') {
+        const filename = sequence++
+
+        accountDataLocal.value.memPhysical = fileReader.result
+        uploadImage(fileReader.result, filename)
+      }
+    }
+  }
+}
+
+const uploadImage = async (dataURI, filename) => {
+  try {
+    const formData = new FormData()
+    const file = dataURItoBlob(dataURI)
+
+    formData.append('memPhysical', file, filename)
+
+    const response = await axios.post("/memPhysical/insert", formData)
+
+    console.log(response)
+    console.log(response.data)
+  } catch (error) {
+    console.error("이미지 파일 업로드 실패", error)
+  }
 }
 </script>
+

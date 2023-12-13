@@ -1,6 +1,4 @@
 <script setup>
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
-import axios from '@axios'
 import { useGenerateImageVariant } from '@core/composable/useGenerateImageVariant'
 import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
 import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
@@ -11,6 +9,11 @@ import authV2MaskLight from '@images/pages/auth-v2-mask-light.png'
 import tree from '@images/pages/tree.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { useRouter } from 'vue-router'
+import { useKakao } from 'vue3-kakao-sdk'
+import axios from 'e:/gun_workspace/gun_vue/node_modules/axios/index'
+
+const { kakao } = useKakao()
 
 const router = useRouter()
 
@@ -30,10 +33,83 @@ const loginCheck = () => {
     memEmail: form.value.email,
     memPw: form.value.password,
   }).then(r => {
-    console.log(r)
+    
+    const { accessToken, refreshToken } = r.data
+
+    sessionStorage.setItem('accessToken', accessToken)
+    sessionStorage.setItem('refreshToken', refreshToken)
+    sessionStorage.setItem('memEmail', form.value.email)
+    sessionStorage.setItem('loginType', 'member')
+
+    router.push("/")
+    
   }).catch(e => {
     console.log(e)
   })
+}
+
+const kakaoLogin = () => {
+  console.log("카카오 로그인 누름")
+  kakao.value.Auth.login({
+    success(success){
+      console.log(success)
+      console.log(success.access_token)
+      console.log(success.refresh_token)
+
+      const accessToken = success.access_token
+      const apiUrl = 'https://kapi.kakao.com/v2/user/me'
+
+      // 카카오 API를 호출하여 사용자 정보 및 이메일 가져오기
+      axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        params: {
+          property_keys: ['kakao_account.email'], // 이메일 정보를 가져오기 위한 요청
+        },
+      })
+        .then(response => {
+          const email = response.data.kakao_account.email
+
+          console.log('사용자 이메일:', email)
+
+          const kakaoInfo = {
+            accessToken: accessToken,
+            refreshToken: success.refresh_token,
+            memEmail: email,
+          }
+
+          performKakaoLogin(kakaoInfo)
+        })
+        .catch(error => {
+          console.error('이메일 가져오기 실패:', error.response.data)
+        })
+    },
+    fail(err){
+      console.log(err)
+    },
+  })
+}
+
+const performKakaoLogin = kakaoInfo => {
+  axios.post('/loginkakao', kakaoInfo, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+    .then(response => {
+      console.log("Response from server:", response)
+
+      const { accessToken, refreshToken } = response.data
+
+      sessionStorage.setItem('accessToken', accessToken)
+      sessionStorage.setItem('refreshToken', refreshToken)
+      sessionStorage.setItem('loginType', 'kakao')
+      router.push("/")
+    })
+    .catch(error => {
+      console.error('로그인:', error)
+    })
 }
 </script>
 
@@ -164,7 +240,11 @@ const loginCheck = () => {
                   cols="12"
                   class="text-center"
                 >
-                  <AuthProvider />
+                  <img
+                    src="@images/loginImages/kakao_login_small.png"
+                    alt="카카오로그인"
+                    @click="kakaoLogin"
+                  >
                 </VCol>
               </VRow>
             </VForm>
