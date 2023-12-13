@@ -21,9 +21,20 @@ const logout = () => {
     if (kakao.value && kakao.value.Auth) {
       try {
 
-        window.Kakao.Auth.logout(function (){
-          alert('로그아웃 성공', accessToken)
+        // window.Kakao.Auth.logout(function (){
+        //   alert('로그아웃 성공', accessToken)
+        // })
+        
+        window.Kakao.API.request({
+          url: '/v1/user/unlink',
+          success: function (response) {
+            
+          },
+          fail: function (error) {
+            console.log(error)
+          },
         })
+
 
         // kakao.value.Auth.logout()
       } catch (error) {

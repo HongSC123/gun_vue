@@ -40,7 +40,7 @@ const loginCheck = () => {
     sessionStorage.setItem('refreshToken', refreshToken)
     sessionStorage.setItem('memEmail', form.value.email)
     sessionStorage.setItem('loginType', 'MEMBER')
-
+    axios.defaults.headers['loginType'] = 'MEMBER'
     router.push("/")
     
   }).catch(e => {
@@ -107,6 +107,7 @@ const performKakaoLogin = kakaoInfo => {
       sessionStorage.setItem('refreshToken', refreshToken)
       sessionStorage.setItem('memEmail', kakaoInfo.memEmail)
       sessionStorage.setItem('loginType', 'KAKAO')
+      axios.defaults.headers['loginType'] = 'KAKAO'
       router.push("/")
     })
     .catch(error => {
