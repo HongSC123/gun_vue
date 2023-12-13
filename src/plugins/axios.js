@@ -44,7 +44,9 @@ axiosIns.interceptors.request.use(config => {
     // console.log(config.headers.common['refresh'])
 
     // 토큰의 로그인 타입을 헤더에 추가합니다.
+    
     config.headers['loginType'] = `${loginType}`
+    console.log(config.headers.loginType)
 
     if(loginType === 'kakao'){
       config.headers['memEmail'] = `${sessionStorage.getItem('memEmail')}`
