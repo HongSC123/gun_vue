@@ -15,9 +15,17 @@ const numberedSteps = [
   },
 ]
 
-const currentStep = ref(0)
-const isPasswordVisible = ref(false)
-const isCPasswordVisible = ref(false)
+const currentStep = ref(0);
+const selectedImage = ref(null);
+const imagePreview = ref(null);
+
+const previewImage = () => {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    imagePreview.value = e.target.result;
+  };
+  reader.readAsDataURL(selectedImage.value);
+};
 
 const formData = ref({
   username: '',
@@ -37,9 +45,6 @@ const formData = ref({
 const onSubmit = () => {
   console.log(formData.value)
 }
-
-
-
 
 </script>
 
@@ -79,30 +84,17 @@ const onSubmit = () => {
             <VRow>
               <VCol
                 cols="12"
-                md="3"
-              />
-
-              <VCol
-                cols="12"
-                md="6"
+                md="4"
               >
-              <VFileInput
-                v-model="selectedImage"
-                placeholder="Click to select image or take photo"
-                label="Image"
-                accept="image/*"
-                @change="previewImage"
-                show-size
-                outlined
-                style="height: 30vh;" 
-              />
-                <VImg v-if="imagePreview" :src="imagePreview" max-height="400" />
+              <div>
+                <input type="file" @change="previewImage" accept="image/*" />
+                <img v-if="imagePreview" :src="imagePreview" alt="Image preview" />
+              </div>
               </VCol>
+              <VCol cols="12" md="6">
+              <!-- 이미지 미리보기가 표시될 영역 -->
               
-              <VCol
-                cols="12"
-                md="3"
-              />
+            </VCol>
             </VRow>
           </VWindowItem>
 
