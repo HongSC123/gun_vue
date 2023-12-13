@@ -6,7 +6,6 @@ export default [
     children: [
       { title: '냉장고관리', to: 'ref-refMain' },
       { title: '물품 등록', to: 'ref-refInsert' },
-      { title: '디텍트', to: 'ref-detect' },
     ],
   },
 ]

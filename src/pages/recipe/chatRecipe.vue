@@ -1,47 +1,22 @@
 <template>
       <v-container>
      <v-row justify="center">
-            <VBtn
-              color="primary"
-              variant="tonal"
-              :to="{path: '/'}"
-              class="mr-3"
-            >
+            <VBtn color="primary" variant="tonal" :to="{path: '/'}" class="mr-3">
               메인화면으로
-              <VIcon
-                end
-                icon="mdi-home"
-              />
+              <VIcon end icon="mdi-home"/>
             </VBtn>
-            <VBtn
-              color="secondary"
-              variant="tonal"
-              :to="{path: 'chatrecent'}"
-              class="mr-3"
-            >
+            <VBtn color="secondary" variant="tonal" :to="{path: 'chatrecent'}" class="mr-3">
               최근 답변
-              <VIcon
-                end
-                icon="mdi-history"
-              />
+              <VIcon end icon="mdi-history"/>
             </VBtn>
-            <VBtn
-              color="info"
-              variant="tonal"
-              :to="{path: 'chatfixed'}"
-              class="mr-3"
-            >
+            <VBtn color="info" variant="tonal" :to="{path: 'chatfixed'}" class="mr-3">
               고정 답변
-              <VIcon
-                end
-                icon="mdi-heart"
-              />
+              <VIcon end icon="mdi-heart"/>
             </VBtn>
           </v-row>
         </v-container>
     <div id="chat-container">
       <div id="chat-messages">
-        <!-- 메시지를 표시할 영역 -->
         <div v-for="(msg, index) in chatHistory" :key="index" :class="msg.isUserMessage ? 'user-message' : 'ai-message'">
           {{ msg.sender }} : {{ msg.message }}
         </div>
@@ -60,9 +35,9 @@
   export default {
     data() {
       return {
-        userMessage: '', // 사용자 입력 메시지를 담을 데이터 속성
-        chatHistory: [], // 채팅 기록을 담을 배열
-        apiKey: "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",
+        userMessage: '',
+        chatHistory: [], 
+        apiKey: "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",
         apiEndpoint: 'https://api.openai.com/v1/chat/completions',
       };
     },
@@ -73,7 +48,6 @@
         }
       },
       async addMessage(sender, message, isUserMessage) {
-        // 메시지를 채팅 기록에 추가하는 메서드
         this.chatHistory.unshift({ sender, message, isUserMessage });
       },
       async fetchAIResponse(prompt) {
@@ -112,12 +86,13 @@
         if (message.length === 0) return;
   
         const isRecipeRelated = /레시피|요리법/.test(message) || /^[가-힣\s]+$/.test(message);
-  
+        
+        const memEmail = sessionStorage.getItem('memEmail'); 
+
         if (isRecipeRelated) {
-          // this.addMessage('나', message, true);
           this.userMessage = '';
 
-          let userQuery = message; // 사용자의 검색어로 할당
+          let userQuery = message;
 
   
           if (!/레시피|요리법/.test(message)) {
@@ -130,19 +105,19 @@
           const aiResponse = await this.fetchAIResponse(message);
           this.addMessage('라따뚜AI', aiResponse, false);
   
-           // 숫자를 포함하는지 확인
+          
           if (aiResponse.match(/\d+/)) {
-        // 데이터를 Java 백엔드로 전송
         try {
           const dataToSend = {
               chat_title: userQuery,
-              chat_content: aiResponse
+              chat_content: aiResponse,
+              memEmail: memEmail,
             };
 
             const response = await axios.post('http://localhost:8888/chatinsert', dataToSend);
-            console.log('Data sent to Java backend:', response.data, dataToSend);
+            console.log('백엔드로 데이터 전송 성공:', response.data, dataToSend);
           } catch (error) {
-            console.error('Error sending data to Java backend:', error);
+            console.error('백엔드로 데이터 전송 실패:', error);
           }
       }
         } else {
@@ -153,20 +128,16 @@
       },
     },
     mounted() {
-      // 초기 화면에 인삿말 추가
       this.addMessage('라따뚜AI', '안녕하세요! 어떤 레시피를 검색하고 싶으세요? 음식 이름만 말해주시면 조리법과 1인분 열량을 알려드리겠습니다!');
-      // Enter 키 이벤트를 추가합니다.
       document.addEventListener('keydown', this.handleKeyDown);
     },
     beforeUnmount() {
-      // 컴포넌트가 삭제되기 전에 이벤트 리스너를 해제합니다.
       document.removeEventListener('keydown', this.handleKeyDown);
     },
   };
   </script>
     
     <style>
-    /* 스타일 영역에 CSS를 추가할 수 있습니다. */
     body {
               display: flex;
               justify-content: center;
@@ -181,15 +152,13 @@
               background-color: #e6e6e6;
           }
           #chat-container {
-      /* width: 700px; */
       height: 700px;
       display: flex;
       flex-direction: column;
       border: 1px solid #ccc;
       background-image: url('../../assets/images/bg.jpeg');
-      background-size: cover; /* 배경 이미지를 요소에 맞게 조절 */
-      background-position: center; /* 배경 이미지의 위치를 가운데로 정렬 */
-      /* 다른 배경 속성들을 추가할 수 있음 */
+      background-size: cover; 
+      background-position: center; 
   }
           #chat-messages {
               flex: 1;
@@ -216,22 +185,22 @@
               cursor: pointer;
           }
   .user-message {
-      background: linear-gradient(to right, #FFF176, #FFD700); /* 노란색 배경 */
-      border-radius: 15px; /* 말풍선을 둥글게 만듦 */
-      padding: 10px; /* 내용과 테두리 간격 */
-      margin-bottom: 10px; /* 아래 여백 추가 */
+      background: linear-gradient(to right, #FFF176, #FFD700); 
+      border-radius: 15px; 
+      padding: 10px; 
+      margin-bottom: 10px; 
       color: black;
-      max-width: 70%; /* 최대 너비 설정 */
-      align-self: flex-end; /* 사용자 메시지는 왼쪽으로 정렬 */
+      max-width: 70%;
+      align-self: flex-end; 
   }
   
   .ai-message {
-      background: linear-gradient(to right, #53a157, #32CD32); /* 초록색 배경 */
-      border-radius: 15px; /* 말풍선을 둥글게 만듦 */
-      padding: 10px; /* 내용과 테두리 간격 */
-      margin-bottom: 10px; /* 아래 여백 추가 */
+      background: linear-gradient(to right, #53a157, #32CD32);
+      border-radius: 15px; 
+      padding: 10px; 
+      margin-bottom: 10px;
       color: white;
-      max-width: 70%; /* 최대 너비 설정 */
-      align-self: flex-start; /* AI 메시지는 오른쪽으로 정렬 */
+      max-width: 70%;
+      align-self: flex-start;
   }
     </style>

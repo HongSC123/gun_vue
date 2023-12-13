@@ -92,7 +92,6 @@ const handleNavScroll = evt => {
           to="/"
           class="app-logo d-flex align-center gap-x-3 app-title-wrapper"
         >
-          <!-- 사이드바 헤더 -->
           <VNodeRenderer :nodes="config.app.logo" />
          
           <Transition name="vertical-nav-app-title">
