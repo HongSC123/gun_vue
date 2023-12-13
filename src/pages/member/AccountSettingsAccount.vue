@@ -68,7 +68,7 @@ const optionSave = async () => {
   formData.append('memWeight', accountDataLocal.value.memWeight)
   formData.append('memHeight', accountDataLocal.value.memHeight)
   formData.append('memBir', accountDataLocal.value.memBir)
-  formData.append('memActLevel', accountDataLocal.value.memActLevel)
+  formData.append('memActLevel', mapActivityToFloat(accountDataLocal.value.memActLevel))
   formData.append('memEmail', memEmail)
 
   sessionStorage.removeItem('memEmail')
@@ -79,10 +79,16 @@ const optionSave = async () => {
         'Content-Type': 'multipart/form-data',
       },
     })
+      .then(r => {
+        console.log(r)
+      })
+      .catch(e => {
+        console.log(e)
+      })
 
-    console.log(response.data)
+    console.log(response)
 
-    router.push("/")
+    router.push("/login")
 
   } catch (error) {
     console.error(error)
@@ -92,6 +98,18 @@ const optionSave = async () => {
 onBeforeMount(() => {
   sessionStorage.removeItem('memEmail')
 })
+
+const mapActivityToFloat = activity => {
+  const mappingTable = {
+    '비 활동적': 1.25,
+    '일반/보통': 1.27,
+    '활동적': 1.29,
+    '매우 활동적': 1.30,
+  }
+
+  
+  return mappingTable[activity]
+}
 </script>
 
 <template>
@@ -208,7 +226,8 @@ onBeforeMount(() => {
                 md="6"
               >
                 <VSelect
-                  variant="활동량"
+                  v-model="accountDataLocal.memActLevel"
+                  clearable
                   label="활동량"
                   :items="['비 활동적', '일반/보통','활동적','매우 활동적']"
                 />

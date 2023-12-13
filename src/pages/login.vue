@@ -39,8 +39,8 @@ const loginCheck = () => {
     sessionStorage.setItem('accessToken', accessToken)
     sessionStorage.setItem('refreshToken', refreshToken)
     sessionStorage.setItem('memEmail', form.value.email)
-    sessionStorage.setItem('loginType', 'member')
-
+    sessionStorage.setItem('loginType', 'MEMBER')
+    axios.defaults.headers['loginType'] = 'MEMBER'
     router.push("/")
     
   }).catch(e => {
@@ -53,8 +53,9 @@ const kakaoLogin = () => {
   kakao.value.Auth.login({
     success(success){
       console.log(success)
-      console.log(success.access_token)
-      console.log(success.refresh_token)
+
+      // console.log(success.access_token)
+      // console.log(success.refresh_token)
 
       const accessToken = success.access_token
       const apiUrl = 'https://kapi.kakao.com/v2/user/me'
@@ -71,7 +72,7 @@ const kakaoLogin = () => {
         .then(response => {
           const email = response.data.kakao_account.email
 
-          console.log('사용자 이메일:', email)
+          // console.log('사용자 이메일:', email)
 
           const kakaoInfo = {
             accessToken: accessToken,
@@ -104,7 +105,9 @@ const performKakaoLogin = kakaoInfo => {
 
       sessionStorage.setItem('accessToken', accessToken)
       sessionStorage.setItem('refreshToken', refreshToken)
-      sessionStorage.setItem('loginType', 'kakao')
+      sessionStorage.setItem('memEmail', kakaoInfo.memEmail)
+      sessionStorage.setItem('loginType', 'KAKAO')
+      axios.defaults.headers['loginType'] = 'KAKAO'
       router.push("/")
     })
     .catch(error => {
