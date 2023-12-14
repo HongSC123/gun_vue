@@ -2,12 +2,18 @@
 import axios from '@axios'
 import avatar1 from '@images/avatars/avatar-1.png'
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useKakao } from 'vue3-kakao-sdk'
 
+const router = useRouter()
 const { kakao } = useKakao()
 
 const loginType = sessionStorage.getItem('loginType')
 const accessToken = sessionStorage.getItem('accessToken')
+const role = sessionStorage.getItem('role')
+
+console.log(loginType)
+console.log(accessToken)
 
 const showLogout = ref(!!accessToken)
 const showLogin = ref(!showLogout.value)
@@ -46,10 +52,7 @@ const logout = () => {
   }
   axios.post("/logout", { accessToken })
     .then(r => {
-      sessionStorage.removeItem('accessToken')
-      sessionStorage.removeItem('refreshToken')
-      sessionStorage.removeItem('memEmail')
-      sessionStorage.removeItem('loginType')
+      sessionStorage.clear()
 
       // 로그아웃 시에 실행할 코드
       axios.defaults.headers.common['Authorization'] = 'logout'
@@ -59,8 +62,10 @@ const logout = () => {
       // console.log("response", r)
       showLogout.value = false
       showLogin.value = true
+      window.location.reload()
 
       // console.log("로그아웃 성공")
+
     })
 }
 
@@ -83,20 +88,11 @@ onMounted(async () => {
 
       userData.value = response.data
 
-      // E:\gun_workspace\gun\src\main\resources\
-      // console.log(userData.value)
-      // console.log(userData.value.memEmail)
-      // console.log(userData.value.memPhoto)
-
     } catch (error) {
       console.error(error)
     }
   }
 })
-
-// const photoUrl = "E:/gun_workspace/gun/src/main/resources/" + userData.value.memPhoto
-
-// console.log(photoUrl)
 </script>
 
 <template>
@@ -112,8 +108,18 @@ onMounted(async () => {
       color="primary"
       variant="tonal"
     >
-      <VImg :src="avatar1" />
-
+      <VImg
+        v-if="userData.memPhoto"
+        :src="'http://127.0.0.1:8080/'+userData.memPhoto"
+      />
+      <VImg
+        v-else-if="loginType ==='KAKAO'"
+        :src="src/assets/images/loginImages/kakao.png"
+      />
+      <VImg
+        v-else
+        :src="avatar1"
+      />
       <!-- SECTION Menu -->
       <VMenu
         activator="parent"
@@ -139,10 +145,17 @@ onMounted(async () => {
                   >
                     <img
                       v-if="userData.memPhoto"
-                      src="E:/gun_workspace/gun/src/main/resources/member/test6/avatar.png"
+                      :src="'http://127.0.0.1:8080/'+userData.memPhoto"
+                      
                       alt="프로필"
                       style="width: 24px; height: 24px;"
                     >
+                    <VImg
+                      v-else-if="loginType === 'KAKAO'"
+                      src="src/assets/images/loginImages/kakao.png"
+                      alt="프로필"
+                      style="width: 24px; height: 24px;"
+                    />
                     <VImg
                       v-else
                       :src="avatar1"
@@ -162,7 +175,10 @@ onMounted(async () => {
           <VDivider class="my-2" />
 
           <!-- 👉 Profile -->
-          <VListItem link>
+          <VListItem
+            link
+            @click="router.push('/info')"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -171,11 +187,14 @@ onMounted(async () => {
               />
             </template>
 
-            <VListItemTitle>Profile</VListItemTitle>
+            <VListItemTitle>마이페이지</VListItemTitle>
           </VListItem>
 
           <!-- 👉 Settings -->
-          <VListItem link>
+          <VListItem
+            link
+            @click="router.push('/security')"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -184,20 +203,7 @@ onMounted(async () => {
               />
             </template>
 
-            <VListItemTitle>Settings</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="mdi-currency-usd"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Pricing</VListItemTitle>
+            <VListItemTitle>비밀번호변경</VListItemTitle>
           </VListItem>
 
           <!-- 👉 FAQ -->
@@ -243,6 +249,21 @@ onMounted(async () => {
               />
             </template>
             <VListItemTitle>Login</VListItemTitle>
+          </VListItem>
+
+          <!-- 👉 token check -->
+          <VListItem 
+            v-if="role === 'ADMIN'"
+            @click="tokenCheck"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="mdi-login"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>Token</VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>

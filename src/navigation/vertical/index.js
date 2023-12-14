@@ -1,5 +1,4 @@
-
-
+import admin from './admin'
 import jinwoo from './jinwoo'
 import recipe from './recipe'
 import ref from './ref'
@@ -18,7 +17,7 @@ export default [
   ...jinwoo,
   ...ref,
   ...recipe,
-  
+  ...admin,
 
 ]
 
