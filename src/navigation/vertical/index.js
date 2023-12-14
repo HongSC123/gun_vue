@@ -2,6 +2,7 @@ import admin from './admin'
 import jinwoo from './jinwoo'
 import recipe from './recipe'
 import ref from './ref'
+import calorie from './calorie'
 
 export default [
   {
@@ -18,6 +19,7 @@ export default [
   ...ref,
   ...recipe,
   ...admin,
+  ...calorie,
 
 ]
 
