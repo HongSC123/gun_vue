@@ -1,19 +1,15 @@
 <template>
   <div>
-    <VCard
-      class="mb-6"
-      title="Kick start your project 🚀"
-    >
-      <VCardText>All the best for your new project.</VCardText>
+    <VCard class="mb-6">
+      <VCardTitle>
+        <v-img
+          src="@/assets/images/salad.png"
+          height="673"
+          width="1200"
+        ></v-img>
+      </VCardTitle>
       <VCardText>
-        Please make sure to read our <a
-          href="https://themeselection.com/demo/materio-vuetify-vuejs-admin-template/documentation"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="text-decoration-none"
-        >
-          Template Documentation
-        </a> to understand where to go from here and how to use our template.
+        <!-- 기타 텍스트 내용 -->
       </VCardText>
     </VCard>
 
