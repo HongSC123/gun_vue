@@ -37,7 +37,7 @@
   </template>
   
   <script>
-  import axios from 'axios';
+  import axios from '@axios';
   
   export default {
     data(){
@@ -75,23 +75,22 @@
       async toggleChatFixChange() {
       try {
         const newFixStatus = this.chat_fix === 'Y' ? 'N' : 'Y'; // chat_fix 값을 반전시킴
-        const response = await fetch(`/chatupdate/${this.chat_num}`, {
+        const response = await axios.put(`/chatupdate/${this.chat_num}`, newFixStatus, {
           method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: newFixStatus // 변경된 상태를 JSON 형태로 전송
+      headers: {
+        'Content-Type': 'text/plain'
+      },
+      body: newFixStatus 
         });
 
-        if (response.ok) {
-          // 서버로부터 응답이 성공적으로 온 경우에만 로컬 데이터를 업데이트합니다.
-          this.chat_fix = newFixStatus; // 상태를 업데이트
-        } else {
-          throw new Error('업데이트 실패');
-        }
-      } catch (error) {
-        console.error('업데이트 에러:', error);
-      }
+        if (response.status === 200) {
+      this.chat_fix = newFixStatus; 
+    } else {
+      throw new Error('업데이트 실패');
+    }
+  } catch (error) {
+    console.error('업데이트 에러:', error);
+  }
     },
       movetomain() {
         window.location.href='/';

@@ -139,16 +139,13 @@ const performKakaoLogin = kakaoInfo => {
 
 const loginface = () => {
   console.log("face")
-
-  router.push("/faceLogin")
-
-  // axios.post("/login/face")
-  //   .then(r => {
-  //     console.log(r)
-  //   })
-  //   .catch(e => {
-  //     console.log(e)
-  //   })
+  axios.post("/login/face")
+    .then(r => {
+      console.log(r)
+    })
+    .catch(e => {
+      console.log(e)
+    })
 }
 </script>
 

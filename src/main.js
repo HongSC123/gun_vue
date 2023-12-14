@@ -10,8 +10,6 @@ import { createApp } from 'vue'
 
 import { createVueKakaoSdk } from 'vue3-kakao-sdk'
 
-
-
 loadFonts()
 
 const app = createApp(App)

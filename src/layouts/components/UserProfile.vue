@@ -63,7 +63,7 @@ const logout = () => {
       showLogout.value = false
       showLogin.value = true
       window.location.reload()
-      
+
       // console.log("로그아웃 성공")
 
     })
