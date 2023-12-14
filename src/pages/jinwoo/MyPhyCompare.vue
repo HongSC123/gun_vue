@@ -1,6 +1,6 @@
 <template>
   <div>
-    <VCard title="Create Awesome 🙌">
+    <VCard title="체형 비교 🙌">
       <VCardText>This is your second page.</VCardText>
       <VCardText>
         Chocolate sesame snaps pie carrot cake pastry pie lollipop muffin.

@@ -10,10 +10,8 @@ import tree from '@images/pages/tree.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 import { useRouter } from 'vue-router'
-import { useKakao } from 'vue3-kakao-sdk'
 import axios from 'e:/gun_workspace/gun_vue/node_modules/axios/index'
 
-const { kakao } = useKakao()
 
 const router = useRouter()
 
@@ -32,6 +30,7 @@ const loginCheck = () => {
   axios.post('/login', {
     memEmail: form.value.email,
     memPw: form.value.password,
+    role: 1,
   }).then(r => {
     
     const { accessToken, refreshToken, role } = r.data
@@ -40,8 +39,8 @@ const loginCheck = () => {
     sessionStorage.setItem('refreshToken', refreshToken)
     sessionStorage.setItem('role', role)
     sessionStorage.setItem('memEmail', form.value.email)
-    sessionStorage.setItem('loginType', 'MEMBER')
-    axios.defaults.headers['loginType'] = 'MEMBER'
+    sessionStorage.setItem('loginType', 'ADMIN')
+    axios.defaults.headers['loginType'] = 'ADMIN'
     console.log(r)
     if(r.data.error === '801'){
       alert("회원이 아닙니다.")
@@ -53,99 +52,11 @@ const loginCheck = () => {
 
       return
     }
-    if(r.data.error === '803'){
-      alert("Admin 로그인을 이용하세요")
-      
-      return
-    }
-
     router.push("/")
     
   }).catch(e => {
     console.log(e)
   })
-}
-
-const kakaoLogin = () => {
-  console.log("카카오 로그인 누름")
-  kakao.value.Auth.login({
-    success(success){
-      console.log(success)
-
-      // console.log(success.access_token)
-      // console.log(success.refresh_token)
-
-      const accessToken = success.access_token
-      const apiUrl = 'https://kapi.kakao.com/v2/user/me'
-
-      // 카카오 API를 호출하여 사용자 정보 및 이메일 가져오기
-      axios.get(apiUrl, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        params: {
-          property_keys: ['kakao_account.email'], // 이메일 정보를 가져오기 위한 요청
-        },
-      })
-        .then(response => {
-          const email = response.data.kakao_account.email
-
-          // console.log('사용자 이메일:', email)
-
-          const kakaoInfo = {
-            accessToken: accessToken,
-            refreshToken: success.refresh_token,
-            memEmail: email,
-          }
-
-          performKakaoLogin(kakaoInfo)
-        })
-        .catch(error => {
-          console.error('이메일 가져오기 실패:', error.response.data)
-        })
-    },
-    fail(err){
-      console.log(err)
-    },
-  })
-}
-
-const performKakaoLogin = kakaoInfo => {
-  axios.post('/loginkakao', kakaoInfo, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-    .then(response => {
-      console.log("Response from server:", response)
-
-      const { accessToken, refreshToken, role } = response.data
-
-      sessionStorage.setItem('accessToken', accessToken)
-      sessionStorage.setItem('refreshToken', refreshToken)
-      sessionStorage.setItem('memEmail', kakaoInfo.memEmail)
-      sessionStorage.setItem('loginType', 'KAKAO')
-      sessionStorage.setItem('role', role)
-      axios.defaults.headers['loginType'] = 'KAKAO'
-
-      console.log(axios.defaults.headers)
-
-      router.replace("/")
-    })
-    .catch(error => {
-      console.error('로그인:', error)
-    })
-}
-
-const loginface = () => {
-  console.log("face")
-  axios.post("/login/face")
-    .then(r => {
-      console.log(r)
-    })
-    .catch(e => {
-      console.log(e)
-    })
 }
 </script>
 
@@ -246,12 +157,6 @@ const loginface = () => {
                   >
                     Login
                   </VBtn>
-                  <VBtn
-                    block
-                    @click="loginface"
-                  >
-                    안면인식
-                  </VBtn>
                 </VCol>
 
                 <!-- create account -->
@@ -262,7 +167,7 @@ const loginface = () => {
                   <span>New on our platform?</span>
                   <RouterLink
                     class="text-primary ms-2"
-                    :to="{ name: 'register' }"
+                    :to="{ name: 'AdminRegister' }"
                   >
                     Create an account
                   </routerlink>
@@ -275,18 +180,6 @@ const loginface = () => {
                   <VDivider />
                   <span class="mx-4">or</span>
                   <VDivider />
-                </VCol>
-
-                <!-- auth providers -->
-                <VCol
-                  cols="12"
-                  class="text-center"
-                >
-                  <img
-                    src="@images/loginImages/kakao_login_small.png"
-                    alt="카카오로그인"
-                    @click="kakaoLogin"
-                  >
                 </VCol>
               </VRow>
             </VForm>

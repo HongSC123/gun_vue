@@ -12,6 +12,7 @@ import { VerticalNavLayout } from '@layouts'
 
 const { appRouteTransition, isLessThanOverlayNavBreakpoint } = useThemeConfig()
 const { width: windowWidth } = useWindowSize()
+const token = sessionStorage.getItem('accessToken')
 </script>
 
 <template>
@@ -31,8 +32,13 @@ const { width: windowWidth } = useWindowSize()
         <NavbarThemeSwitcher />
 
         <VSpacer />
-
-        <UserProfile />
+        <UserProfile v-if="token" />
+        <VBtn
+          v-else
+          to="/login"
+        >
+          로그인
+        </VBtn>
       </div>
     </template>
 

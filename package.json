@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "vite --host --port 2222",
-    "build": "vite build --watch",
+    "build": "vite build --watch --emptyOutDir",
     "preview": "vite preview --port 1010",
     "lint": "eslint . -c .eslintrc.js --fix --ext .ts,.js,.vue,.tsx,.jsx",
     "build:icons": "node src/@iconify/build-icons.js",
@@ -17,7 +17,7 @@
     "@vueuse/core": "10.1.2",
     "@vueuse/math": "10.1.2",
     "apexcharts-clevision": "3.28.5",
-    "axios": "1.4.0",
+    "axios": "^1.6.2",
     "axios-mock-adapter": "1.21.4",
     "chart.js": "4.3.0",
     "eslint-import-resolver-alias": "^1.1.2",
@@ -33,6 +33,7 @@
     "vue-prism-component": "2.0.0",
     "vue-router": "4.2.0",
     "vue3-apexcharts": "1.4.1",
+    "vue3-kakao-sdk": "^0.2.1",
     "vue3-perfect-scrollbar": "1.6.1",
     "vuetify": "3.2.1",
     "webfontloader": "1.6.28"
