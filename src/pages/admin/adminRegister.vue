@@ -41,10 +41,10 @@ const register = () => {
   axios.post('/signup', {
     memEmail: email.value,
     memPw: password.value,
-    role: 0,
+    role: 1,
   }).then(r => {
     sessionStorage.setItem('memEmail', email.value)
-    router.push({ name: 'AccountSettings' })
+    router.push({ name: 'AdminLogin' })
 
   }).catch(e => {
     const { errors: formErrors } = e.response.data
