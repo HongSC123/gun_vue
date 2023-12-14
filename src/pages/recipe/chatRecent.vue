@@ -24,13 +24,13 @@
           </VBtn>
         </v-row>
         <v-row>
-          <v-simple-table style="width: 1500px">
+          <v-simple-table style="width: 1500px;">
             <thead>
               <tr style="font-weight: bolder;">
-                  <td style="width: 200px; background-color: #E2EFDA; color: #000000;">번호</td>
-                  <td style="width: 800px; background-color: #E2EFDA; color: #000000;">검색어</td>
-                  <td style="width: 400px; background-color: #E2EFDA; color: #000000;">작성시간</td>
-                  <td style="width: 200px; background-color: #E2EFDA; color: #000000;">고정</td>
+                  <td style="width: 200px; background-color: #e2efda; color: #000;">번호</td>
+                  <td style="width: 800px; background-color: #e2efda; color: #000;">검색어</td>
+                  <td style="width: 400px; background-color: #e2efda; color: #000;">작성시간</td>
+                  <td style="width: 200px; background-color: #e2efda; color: #000;">고정</td>
               </tr>
             </thead>
             <tbody>
@@ -47,6 +47,7 @@
             </tbody>
           </v-simple-table>
         </v-row>
+        
         <v-row style="padding-top: 20px;">
   <v-spacer/>
   <v-btn width="10px" @click="movetopreviouspage">
@@ -64,15 +65,18 @@
     <v-icon color="red" large> mdi-arrow-right-bold-outline </v-icon>
   </v-btn>
   <v-spacer/>
+  <v-col cols="12">
+          <input type="search" v-model="searchTerm" placeholder="검색어를 입력하세요" class="v-text-field__input" />
+          <v-btn @click="searchtitlekeyword">검색</v-btn> <!-- 검색 버튼 클릭 시 search 메소드 호출 -->
+        </v-col>
 </v-row>
       </v-container>
-
     </v-main>
   </v-app>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from '@axios';
 export default {
   data() {
   return {
@@ -81,6 +85,8 @@ export default {
     currentPage: 1, 
     itemsPerPage: 10, 
     memEmail: '', 
+    searchTerm: '', // 검색어 상태 값
+    searchResults: [] // 검색 결과를 담을 배열
   };
 },
 computed: {
@@ -127,6 +133,26 @@ axios.get(`http://localhost:8888/chatcount?memEmail=${this.memEmail}`, {
 });
   },
   methods: {
+    async searchtitlekeyword() {
+  console.log('Search method called!');
+  console.log('Search Term:', this.searchTerm);
+  console.log('Email:', this.memEmail);
+  
+  try {
+    const response = await axios.get(`http://localhost:8888/search`, {
+      params: {
+        searchTerm: this.searchTerm,
+        memEmail: this.memEmail,
+      }
+    });
+
+    this.contentlist = response.data;
+    console.log('응답 데이터:', response.data);
+  } catch (error) {
+    console.error('검색 요청 에러:', error);
+  }
+},
+
     async toggleChatFixChange(item) {
     try {
       const newFixStatus = item.chat_fix === 'Y' ? 'N' : 'Y'; 
@@ -195,21 +221,23 @@ axios.get(`http://localhost:8888/chatcount?memEmail=${this.memEmail}`, {
     this.currentPage = page; 
     this.$router.push({ query: { page: page } }); 
   },
-  },
+  }
 };
 </script>
 
 <style scoped>
-.tr,td {
+.tr,
+td {
   border: 1px solid;
   text-align: center;
 }
+
 .page-number {
-  margin-left : 5px;
-  margin-right: 5px; 
+  margin-inline: 5px;
 }
+
 .space-between {
   display: inline-block;
-  width: 10px; 
+  inline-size: 10px;
 }
 </style>

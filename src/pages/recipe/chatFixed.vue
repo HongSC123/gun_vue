@@ -24,7 +24,7 @@
             </VBtn>
           </v-row>
           <v-row>
-            <v-simple-table style="width: 1500px">
+            <v-simple-table style="width: 1500px;">
               <thead>
                 <tr style="font-weight: bolder;">
                     <td style="width: 200px; background-color: #d437e2; color: #fff3f3;">번호</td>
@@ -34,7 +34,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in contentlist" :key="item.id" @click="movetocontent(item.chat_num)">
+                <tr v-for="item in paginatedList" :key="item.chat_num" @click="movetocontent(item.chat_num)">
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_num }}</td>
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_title }}</td>
                     <td v-if="item.chat_fix === 'Y'">{{ item.chat_date }}</td>
@@ -64,6 +64,10 @@
               <v-icon color="red" large> mdi-arrow-right-bold-outline </v-icon>
             </v-btn>
             <v-spacer/>
+            <v-col cols="12">
+              <input type="search" v-model="searchTerm" placeholder="검색어를 입력하세요" class="v-text-field__input" />
+              <v-btn @click="findtitlekeyword">검색</v-btn> <!-- 검색 버튼 클릭 시 search 메소드 호출 -->
+            </v-col>
           </v-row>
         </v-container>
       </v-main>
@@ -71,30 +75,33 @@
   </template>
   
   <script>
-  import axios from 'axios';
+  import axios from '@axios';
   
   export default {
     data() {
   return {
     contentlist: [], 
-    cnt: 0,
+    cnt: 0, 
     currentPage: 1, 
     itemsPerPage: 10, 
+    memEmail: '', 
+    searchTerm: '', // 검색어 상태 값
+    searchResults: [] // 검색 결과를 담을 배열
   };
     },
     computed: {
-  totalpage() {
-        if (this.cnt === 0) {
-          return 1;
-        } else {
-          return Math.ceil(this.cnt / this.itemsPerPage);
-        }
-      },
-      paginatedList() {
-        const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-          const endIndex = startIndex + this.itemsPerPage;
-          return this.contentlist.slice(startIndex, endIndex);
-      },
+      totalpage() {
+    if (this.cnt === 0) {
+      return 1;
+    } else {
+      return Math.ceil(this.cnt / this.itemsPerPage);
+    }
+  },
+  paginatedList() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+      const endIndex = startIndex + this.itemsPerPage;
+      return this.contentlist.slice(startIndex, endIndex);
+  },
     },
     mounted() {
     this.memEmail = sessionStorage.getItem('memEmail'); // memEmail 변수 할당 수정
@@ -113,14 +120,38 @@
     alert(error);
   });
 
-axios.get(`http://localhost:8888/chatYcount?memEmail=${this.memEmail}`, {
+  axios.get(`http://localhost:8888/chatycount?memEmail=${this.memEmail}`, {
   params: {
     boardnum: this.$route.params.id,
   }
 })
+.then(response => {
+  this.cnt = response.data; 
+})
+.catch(error => {
+  alert(error);
+});
     },
-  
     methods: {
+    async findtitlekeyword() {
+  console.log('Search method called!');
+  console.log('Search Term:', this.searchTerm);
+  console.log('Email:', this.memEmail);
+  
+  try {
+    const response = await axios.get(`http://localhost:8888/find`, {
+      params: {
+        searchTerm: this.searchTerm,
+        memEmail: this.memEmail,
+      }
+    });
+
+    this.contentlist = response.data;
+    console.log('응답 데이터:', response.data);
+  } catch (error) {
+    console.error('검색 요청 에러:', error);
+  }
+},
       async toggleChatFixChange(item) {
     try {
       const newFixStatus = item.chat_fix === 'Y' ? 'N' : 'Y'; 
@@ -156,7 +187,7 @@ axios.get(`http://localhost:8888/chatYcount?memEmail=${this.memEmail}`, {
       },
       movetopreviouspage() {
     if (this.currentPage > 1) {
-      this.currentPage--; 
+      this.currentPage--;
       this.$router.push({ query: { page: this.currentPage } }); 
     } else {
       alert('첫번째 페이지입니다!');
@@ -217,16 +248,18 @@ axios.get(`http://localhost:8888/chatYcount?memEmail=${this.memEmail}`, {
   </script>
   
   <style scoped>
-  .tr,td {
-    border: 1px solid;
-    text-align: center;
-  }
-  .page-number {
-  margin-left : 5px;
-  margin-right: 5px; 
+.tr,
+td {
+  border: 1px solid;
+  text-align: center;
 }
+
+.page-number {
+  margin-inline: 5px;
+}
+
 .space-between {
   display: inline-block;
-  width: 10px; 
+  inline-size: 10px;
 }
   </style>
