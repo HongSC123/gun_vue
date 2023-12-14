@@ -24,13 +24,13 @@
           </VBtn>
         </v-row>
         <v-row>
-          <v-simple-table style="width: 1500px">
+          <v-simple-table style="width: 1500px;">
             <thead>
               <tr style="font-weight: bolder;">
-                  <td style="width: 200px; background-color: #E2EFDA; color: #000000;">번호</td>
-                  <td style="width: 800px; background-color: #E2EFDA; color: #000000;">검색어</td>
-                  <td style="width: 400px; background-color: #E2EFDA; color: #000000;">작성시간</td>
-                  <td style="width: 200px; background-color: #E2EFDA; color: #000000;">고정</td>
+                  <td style="width: 200px; background-color: #e2efda; color: #000;">번호</td>
+                  <td style="width: 800px; background-color: #e2efda; color: #000;">검색어</td>
+                  <td style="width: 400px; background-color: #e2efda; color: #000;">작성시간</td>
+                  <td style="width: 200px; background-color: #e2efda; color: #000;">고정</td>
               </tr>
             </thead>
             <tbody>
@@ -76,11 +76,7 @@
 </template>
 
 <script>
-<<<<<<< HEAD
 import axios from '@axios';
-=======
-import axios from 'axios';
->>>>>>> 4ddf6d525558b041793b3298910cbbf706789299
 export default {
   data() {
   return {
@@ -89,11 +85,8 @@ export default {
     currentPage: 1, 
     itemsPerPage: 10, 
     memEmail: '', 
-<<<<<<< HEAD
     searchTerm: '', // 검색어 상태 값
     searchResults: [] // 검색 결과를 담을 배열
-=======
->>>>>>> 4ddf6d525558b041793b3298910cbbf706789299
   };
 },
 computed: {
@@ -227,26 +220,24 @@ axios.get(`http://localhost:8888/chatcount?memEmail=${this.memEmail}`, {
     moveToPage(page) {
     this.currentPage = page; 
     this.$router.push({ query: { page: page } }); 
-<<<<<<< HEAD
-=======
-  },
->>>>>>> 4ddf6d525558b041793b3298910cbbf706789299
   },
   }
 };
 </script>
 
 <style scoped>
-.tr,td {
+.tr,
+td {
   border: 1px solid;
   text-align: center;
 }
+
 .page-number {
-  margin-left : 5px;
-  margin-right: 5px; 
+  margin-inline: 5px;
 }
+
 .space-between {
   display: inline-block;
-  width: 10px; 
+  inline-size: 10px;
 }
 </style>

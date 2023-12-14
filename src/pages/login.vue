@@ -38,10 +38,6 @@ const loginCheck = () => {
 
     sessionStorage.setItem('accessToken', accessToken)
     sessionStorage.setItem('refreshToken', refreshToken)
-<<<<<<< HEAD
-    sessionStorage.setItem('memEmail', form.value.email)
-    sessionStorage.setItem('loginType', 'member')
-=======
     sessionStorage.setItem('role', role)
     sessionStorage.setItem('memEmail', form.value.email)
     sessionStorage.setItem('loginType', 'MEMBER')
@@ -62,7 +58,6 @@ const loginCheck = () => {
       
       return
     }
->>>>>>> 4ddf6d525558b041793b3298910cbbf706789299
 
     router.push("/")
     
