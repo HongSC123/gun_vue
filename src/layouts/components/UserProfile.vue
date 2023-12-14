@@ -1,14 +1,58 @@
 <script setup>
 import axios from '@axios'
 import avatar1 from '@images/avatars/avatar-1.png'
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useKakao } from 'vue3-kakao-sdk'
+
+const router = useRouter()
+const { kakao } = useKakao()
+
+const loginType = sessionStorage.getItem('loginType')
+const accessToken = sessionStorage.getItem('accessToken')
+const role = sessionStorage.getItem('role')
+
+console.log(loginType)
+console.log(accessToken)
+
+const showLogout = ref(!!accessToken)
+const showLogin = ref(!showLogout.value)
+
+console.log(showLogout.value, showLogin.value)
 
 const logout = () => {
   const accessToken = sessionStorage.getItem('accessToken')
+  const loginType = sessionStorage.getItem('loginType')
+  if (loginType === 'KAKAO') {
+    if (kakao.value && kakao.value.Auth) {
+      try {
 
+        // window.Kakao.Auth.logout(function (){
+        //   alert('로그아웃 성공', accessToken)
+        // })
+        
+        window.Kakao.API.request({
+          url: '/v1/user/unlink',
+          success: function (response) {
+            
+          },
+          fail: function (error) {
+            console.log(error)
+          },
+        })
+
+
+        // kakao.value.Auth.logout()
+      } catch (error) {
+        console.error('로그아웃 시도 중 오류 발생:', error)
+      }
+    } else {
+      console.error('Kakao SDK가 초기화되지 않았습니다.')
+    }
+  }
   axios.post("/logout", { accessToken })
     .then(r => {
-      sessionStorage.removeItem('accessToken')
-      sessionStorage.removeItem('refreshToken')
+      sessionStorage.clear()
 
       // 로그아웃 시에 실행할 코드
       axios.defaults.headers.common['Authorization'] = 'logout'
@@ -16,8 +60,12 @@ const logout = () => {
       console.log(axios.defaults.headers.common['Authorization'])
 
       // console.log("response", r)
+      showLogout.value = false
+      showLogin.value = true
+      window.location.reload()
 
       // console.log("로그아웃 성공")
+
     })
 }
 
@@ -30,6 +78,21 @@ const tokenCheck = () => {
       console.log("error", e)
     })
 }
+
+const userData = ref(null)
+
+onMounted(async () => {
+  if (accessToken) {
+    try {
+      const response = await axios.get('/profile')
+
+      userData.value = response.data
+
+    } catch (error) {
+      console.error(error)
+    }
+  }
+})
 </script>
 
 <template>
@@ -45,8 +108,18 @@ const tokenCheck = () => {
       color="primary"
       variant="tonal"
     >
-      <VImg :src="avatar1" />
-
+      <VImg
+        v-if="userData.memPhoto"
+        :src="'http://127.0.0.1:8080/'+userData.memPhoto"
+      />
+      <VImg
+        v-else-if="loginType ==='KAKAO'"
+        :src="src/assets/images/loginImages/kakao.png"
+      />
+      <VImg
+        v-else
+        :src="avatar1"
+      />
       <!-- SECTION Menu -->
       <VMenu
         activator="parent"
@@ -70,21 +143,42 @@ const tokenCheck = () => {
                     color="primary"
                     variant="tonal"
                   >
-                    <VImg :src="avatar1" />
+                    <img
+                      v-if="userData.memPhoto"
+                      :src="'http://127.0.0.1:8080/'+userData.memPhoto"
+                      
+                      alt="프로필"
+                      style="width: 24px; height: 24px;"
+                    >
+                    <VImg
+                      v-else-if="loginType === 'KAKAO'"
+                      src="src/assets/images/loginImages/kakao.png"
+                      alt="프로필"
+                      style="width: 24px; height: 24px;"
+                    />
+                    <VImg
+                      v-else
+                      :src="avatar1"
+                      alt="프로필"
+                      style="width: 24px; height: 24px;"
+                    />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
             </template>
 
             <VListItemTitle class="font-weight-medium">
-              John Doe
+              {{ userData.memEmail }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle>{{ loginType }}</VListItemSubtitle>
           </VListItem>
           <VDivider class="my-2" />
 
           <!-- 👉 Profile -->
-          <VListItem link>
+          <VListItem
+            link
+            @click="router.push('/info')"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -93,11 +187,14 @@ const tokenCheck = () => {
               />
             </template>
 
-            <VListItemTitle>Profile</VListItemTitle>
+            <VListItemTitle>마이페이지</VListItemTitle>
           </VListItem>
 
           <!-- 👉 Settings -->
-          <VListItem link>
+          <VListItem
+            link
+            @click="router.push('/security')"
+          >
             <template #prepend>
               <VIcon
                 class="me-2"
@@ -106,20 +203,7 @@ const tokenCheck = () => {
               />
             </template>
 
-            <VListItemTitle>Settings</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="mdi-currency-usd"
-                size="22"
-              />
-            </template>
-
-            <VListItemTitle>Pricing</VListItemTitle>
+            <VListItemTitle>비밀번호변경</VListItemTitle>
           </VListItem>
 
           <!-- 👉 FAQ -->
@@ -137,42 +221,50 @@ const tokenCheck = () => {
 
           <!-- Divider -->
           <VDivider class="my-2" />
-          <div>
-            <!-- 👉 Logout -->
-            <VListItem @click="logout">
-              <template #prepend>
-                <VIcon
-                  class="me-2"
-                  icon="mdi-logout"
-                  size="22"
-                />
-              </template>
-            
-              <VListItemTitle>Logout</VListItemTitle>
-            </VListItem>
-            <!-- 👉 Login -->
-            <VListItem to="/login">
-              <template #prepend>
-                <VIcon
-                  class="me-2"
-                  icon="mdi-login"
-                  size="22"
-                />
-              </template>
-              <VListItemTitle>Login</VListItemTitle>
-            </VListItem>
-            <!-- 👉 token check -->
-            <VListItem @click="tokenCheck">
-              <template #prepend>
-                <VIcon
-                  class="me-2"
-                  icon="mdi-login"
-                  size="22"
-                />
-              </template>
-              <VListItemTitle>token</VListItemTitle>
-            </VListItem>
-          </div>
+          
+          <!-- 👉 Logout -->
+          <VListItem
+            v-if="!showLogin"
+            @click="logout"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="mdi-logout"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>Logout</VListItemTitle>
+          </VListItem>
+          <!-- 👉 Login -->
+          <VListItem
+            v-if="!showLogout"
+            to="/login"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="mdi-login"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>Login</VListItemTitle>
+          </VListItem>
+
+          <!-- 👉 token check -->
+          <VListItem 
+            v-if="role === 'ADMIN'"
+            @click="tokenCheck"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="mdi-login"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>Token</VListItemTitle>
+          </VListItem>
         </VList>
       </VMenu>
       <!-- !SECTION -->

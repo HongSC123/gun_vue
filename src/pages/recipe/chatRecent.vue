@@ -76,7 +76,11 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import axios from '@axios';
+=======
+import axios from 'axios';
+>>>>>>> 4ddf6d525558b041793b3298910cbbf706789299
 export default {
   data() {
   return {
@@ -85,8 +89,11 @@ export default {
     currentPage: 1, 
     itemsPerPage: 10, 
     memEmail: '', 
+<<<<<<< HEAD
     searchTerm: '', // 검색어 상태 값
     searchResults: [] // 검색 결과를 담을 배열
+=======
+>>>>>>> 4ddf6d525558b041793b3298910cbbf706789299
   };
 },
 computed: {
@@ -220,6 +227,10 @@ axios.get(`http://localhost:8888/chatcount?memEmail=${this.memEmail}`, {
     moveToPage(page) {
     this.currentPage = page; 
     this.$router.push({ query: { page: page } }); 
+<<<<<<< HEAD
+=======
+  },
+>>>>>>> 4ddf6d525558b041793b3298910cbbf706789299
   },
   }
 };

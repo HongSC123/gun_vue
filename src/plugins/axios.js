@@ -21,9 +21,11 @@ axiosIns.interceptors.request.use(config => {
   // 로컬 스토리지에서 토큰을 가져옵니다.
   const token = sessionStorage.getItem('accessToken')
   const refresh = sessionStorage.getItem('refreshToken')
+  const loginType = sessionStorage.getItem('loginType')
 
   console.log("token value : ", token)
   console.log("refresh value : ", refresh)
+  console.log("loginType value : ", loginType)
 
   // 토큰이 존재하는 경우
   if (token) {
@@ -33,15 +35,25 @@ axiosIns.interceptors.request.use(config => {
     // 인증 헤더를 설정합니다.
     // ℹ️ JSON.parse는 토큰을 문자열로 변환합니다.
     //config.headers.Authorization = token ? `Bearer ${JSON.parse(token)}` : ''
-    config.headers.Authorization = `Bearer ${token}`
-
-    config.headers.common = config.headers.common || {}
+    if(loginType === 'KAKAO'){
+      config.headers.Authorization = `Kakao ${token}`
+      config.headers['memEmail'] = `${sessionStorage.getItem('memEmail')}`
+    }else{
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    
 
     // 리프레시 토큰을 요청 헤더에 추가합니다.
     config.headers['refresh'] = `${refresh}`
     
-    console.log(config.headers.Authorization)
-    console.log(config.headers.common['refresh'])
+    // console.log(config.headers.Authorization)
+    // console.log(config.headers.common['refresh'])
+
+    // 토큰의 로그인 타입을 헤더에 추가합니다.
+    
+    config.headers['loginType'] = `${loginType}`
+    console.log(config.headers.loginType)
+
   }
 
   // 수정된 구성을 반환합니다.

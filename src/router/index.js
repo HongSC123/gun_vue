@@ -1,11 +1,12 @@
-import { setupLayouts } from 'virtual:generated-layouts';
-import { createRouter, createWebHistory } from 'vue-router';
+import { setupLayouts } from 'virtual:generated-layouts'
+import { createRouter, createWebHistory } from 'vue-router'
 
-import ChatFixed from '@/pages/recipe/ChatFixed.vue';
-import ChatRecent from '@/pages/recipe/ChatRecent.vue';
-import routes from '~pages';
-import jinwoo from './jinwoo';
-import sun from './sun';
+import ChatFixed from '@/pages/recipe/ChatFixed.vue'
+import ChatRecent from '@/pages/recipe/ChatRecent.vue'
+import routes from '~pages'
+import admin from './admin'
+import jinwoo from './jinwoo'
+import sun from './sun'
 
 
 const additionalRoutes = [
@@ -19,7 +20,7 @@ const additionalRoutes = [
     name: 'ChatFixed',
     component: ChatFixed,
   },
-];
+]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,6 +28,7 @@ const router = createRouter({
     ...setupLayouts(routes),
     ...sun,
     ...additionalRoutes,
+    ...admin,
   ],
   ...jinwoo,
 })

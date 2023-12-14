@@ -1,22 +1,22 @@
 <script setup>
-import axios from '@axios'
 import avatar1 from '@images/avatars/avatar-1.png'
-import { onBeforeMount } from 'vue'
+import { onBeforeMount, ref, readonly } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from '@axios'
 
 const router = useRouter()
 const date = ref('')
 
 const memEmail = sessionStorage.getItem('memEmail')
 
-const accountData = {
+const accountData = readonly({
   memPhoto: avatar1,
   memGen: '성별',
   memWeight: 50,
   memHeight: 180,
   memBir: '1990-01-01',
   memActLevel: '일반',
-}
+})
 
 function dataURItoBlob(dataURI) {
   const byteString = atob(dataURI.split(',')[1])
@@ -31,10 +31,25 @@ function dataURItoBlob(dataURI) {
 
 const refInputEl = ref()
 const isConfirmDialogOpen = ref(false)
-const accountDataLocal = ref(structuredClone(accountData))
+
+const accountDataLocal = ref({
+  memPhoto: accountData.memPhoto,
+  memGen: accountData.memGen,
+  memWeight: accountData.memWeight,
+  memHeight: accountData.memHeight,
+  memBir: accountData.memBir,
+  memActLevel: accountData.memActLevel,
+})
 
 const resetForm = () => {
-  accountDataLocal.value = structuredClone(accountData)
+  accountDataLocal.value = {
+    memPhoto: accountData.memPhoto,
+    memGen: accountData.memGen,
+    memWeight: accountData.memWeight,
+    memHeight: accountData.memHeight,
+    memBir: accountData.memBir,
+    memActLevel: accountData.memActLevel,
+  }
 }
 
 const changeAvatar = file => {
@@ -55,7 +70,7 @@ const resetAvatar = () => {
 }
 
 const next = () => {
-  router.push("/login")
+  router.push("/")
 }
 
 const optionSave = async () => {
@@ -95,6 +110,22 @@ const optionSave = async () => {
   }
 }
 
+onMounted(() => {
+  axios.get('/profile')
+    .then(response => {
+      accountDataLocal.value.memPhoto = response.data.memPhoto
+      accountDataLocal.value.memGen = response.data.memGen
+      accountDataLocal.value.memWeight = response.data.memWeight
+      accountDataLocal.value.memHeight = response.data.memHeight
+      accountDataLocal.value.memBir = response.data.memBir
+      accountDataLocal.value.memActLevel = response.data.memActLevel
+      console.log(response)
+    })
+    .catch(error => {
+      console.log(error)
+    })
+})
+
 onBeforeMount(() => {
   sessionStorage.removeItem('memEmail')
 })
@@ -107,10 +138,10 @@ const mapActivityToFloat = activity => {
     '매우 활동적': 1.30,
   }
 
-  
   return mappingTable[activity]
 }
 </script>
+
 
 <template>
   <VRow>
@@ -122,7 +153,7 @@ const mapActivityToFloat = activity => {
             rounded="sm"
             size="120"
             class="me-6"
-            :image="accountDataLocal.memPhoto"
+            :image="'http://127.0.0.1:8080/'+accountDataLocal.memPhoto"
           />
 
           <!-- 👉 Upload Photo -->
@@ -217,6 +248,7 @@ const mapActivityToFloat = activity => {
                 <AppDateTimePicker
                   v-model="accountDataLocal.memBir"
                   label="생년월일"
+                  aria-readonly="true"
                 />
               </VCol>
 
@@ -254,7 +286,7 @@ const mapActivityToFloat = activity => {
                   variant="outlined"
                   @click="next"
                 >
-                  다음에하기
+                  다음에 수정
                 </VBtn>
               </VCol>
             </VRow>
