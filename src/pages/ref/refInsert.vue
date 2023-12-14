@@ -1,4 +1,9 @@
 <script setup>
+import axios from '@axios';
+import { ref } from 'vue';
+import { VForm } from 'vuetify/components/VForm';
+
+axios.defaults.timeout = 0
 
 const numberedSteps = [
   {
@@ -15,35 +20,123 @@ const numberedSteps = [
   },
 ]
 
+const nameRules = [
+  v => !!v || '이름을 입력해주세요.',
+];
+const quantityRules = [
+  v => v > 0 || '수량은 1 이상이어야 합니다.',
+];
+const dateRules = [
+  v => new Date(v) >= new Date() || '유통기한은 오늘 날짜 이후여야 합니다.',
+];
+
+
+
+const imageSrc = ref('')
 const currentStep = ref(0)
-const isPasswordVisible = ref(false)
-const isCPasswordVisible = ref(false)
+const isCurrentStepValid = ref(true)
+const refAccountForm = ref()
+const refPersonalForm = ref()
+const refSocialLinkForm = ref()
+const dialogVisible = ref(false)
+const dialogMessage = ref('')
 
-const formData = ref({
-  username: '',
-  email: '',
-  password: '',
-  c_password: '',
-  firstName: '',
-  lastName: '',
-  country: undefined,
-  language: undefined,
-  twitter: '',
-  facebook: '',
-  googlePlus: '',
-  linkedIn: '',
-})
+const results = ref([])
+const detectPhoto = async () => {
+  const valid = await refAccountForm.value?.validate()
+  if (valid.valid) {
+    const formData = new FormData()
 
-const onSubmit = () => {
-  console.log(formData.value)
+    formData.append('image_file', file.value[0])
+
+    console.log('file.value[0]:', file.value[0])
+    console.log('formData:', formData)
+
+    try {
+      const response = await axios.post('http://43.201.53.18:8000/detectFruits', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+      console.log('response.data:', response.data)
+      imageSrc.value = 'data:image/jpeg;base64,' + response.data.image
+      console.log('response.data:', response.data.results)
+      results.value = response.data.results.map(item => ({
+        ...item,
+        endDate: end_date(),
+      }))
+      
+    } catch (error) {
+      console.error(error)
+    }
+    
+    currentStep.value++
+    isCurrentStepValid.value = true
+  } else {
+    isCurrentStepValid.value = false
+  }
+}
+const validatePersonalForm = () => {
+  if (results.value.length === 0) {
+    dialogMessage.value = '최소 1개의 항목을 추가해야 합니다.'
+    dialogVisible.value = true
+    isCurrentStepValid.value = false
+    return
+  }
+      const invalidMessages = results.value.reduce((messages, item) => {
+        const nameMessage = nameRules[0](item.name)
+        const quantityMessage = quantityRules[0](item.quantity)
+        const dateMessage = dateRules[0](item.endDate)
+
+        if (nameMessage !== true) messages.push(nameMessage)
+        if (quantityMessage !== true) messages.push(quantityMessage)
+        if (dateMessage !== true) messages.push(dateMessage)
+
+        return messages
+      }, [])
+
+      if (invalidMessages.length === 0) {
+        currentStep.value++
+        isCurrentStepValid.value = true
+      } else {
+        dialogMessage.value = invalidMessages.join('\n')
+        dialogVisible.value = true
+        isCurrentStepValid.value = false
+      }
+    };
+
+const validateSocialLinkForm = () => {
+  refSocialLinkForm.value?.validate().then(valid => {
+    if (valid.valid) {
+      isCurrentStepValid.value = true
+    } else {
+      isCurrentStepValid.value = false
+    }
+  })
+}
+const endDate = ref(end_date());
+
+function end_date() {
+  const today = new Date();
+  today.setDate(today.getDate() + 7);
+  return today.toISOString().substr(0, 10); // yyyy-MM-dd
 }
 
+const addRow = () => {
+  results.value.push({
+    name: '',
+    quantity: 0,
+    endDate: end_date(),
+  });
+};
 
+const deleteRow = (index) => {
+  results.value.splice(index, 1);
+};
 
-
+const file = ref(null)
+const rules = [fileList => !fileList || !fileList.length || fileList[0].size < 10000000 || '파일 용량 제한 10 MB!']
 </script>
-
-
 
 <template>
   <VCard>
@@ -51,8 +144,9 @@ const onSubmit = () => {
       <!-- 👉 Stepper -->
       <AppStepper
         v-model:current-step="currentStep"
-        align="start"
         :items="numberedSteps"
+        align="start"
+        :is-active-step-valid="isCurrentStepValid"
       />
     </VCardText>
 
@@ -60,207 +154,247 @@ const onSubmit = () => {
 
     <VCardText>
       <!-- 👉 stepper content -->
-      <VForm>
-        <VWindow
-          v-model="currentStep"
-          class="disable-tab-transition"
-        >
-          <VWindowItem>
-            <VRow>
-              <VCol cols="12" md="3">
-                <p></p>
-              </VCol>
-            </VRow>
-            <VRow>
-              <VCol cols="12" md="3">
-                <p></p>
-              </VCol>
-            </VRow>
-            <VRow>
-              <VCol
-                cols="12"
-                md="3"
-              />
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-              <VFileInput
-                v-model="selectedImage"
-                placeholder="Click to select image or take photo"
-                label="Image"
-                accept="image/*"
-                @change="previewImage"
-                show-size
-                outlined
-                style="height: 30vh;" 
-              />
-                <VImg v-if="imagePreview" :src="imagePreview" max-height="400" />
-              </VCol>
-              
-              <VCol
-                cols="12"
-                md="3"
-              />
-            </VRow>
-          </VWindowItem>
-
-          <VWindowItem>
+      <!-- 👉 원스탭 -->
+      <VWindow
+        v-model="currentStep"
+        class="disable-tab-transition"
+      >
+        <VWindowItem>
+          <VForm
+            ref="refAccountForm"
+            @submit.prevent="detectPhoto"
+          >
             <VRow>
               <VCol cols="12">
                 <h6 class="text-sm font-weight-medium">
-                  Personal Info
+                  사진을 등록해 주세요
                 </h6>
-                <p class="text-xs mb-0">
-                  Setup Information
-                </p>
               </VCol>
 
               <VCol
                 cols="12"
                 md="6"
               >
-                <VTextField
-                  v-model="formData.firstName"
-                  label="First Name"
-                  placeholder="Leonard"
+                <VFileInput
+                  v-model="file"
+                  :rules="rules"
+                  :multiple="false"
+                  label="Photo"
+                  placeholder="사진을 등록해 주세요"
+                  prepend-icon="mdi-camera-outline"
                 />
               </VCol>
 
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="formData.lastName"
-                  label="Last Name"
-                  placeholder="Carter"
-                />
-              </VCol>
+              <VCol cols="12">
+                <div class="d-flex justify-sm-space-between justify-center flex-wrap gap-4">
+                  <VBtn
+                    :color="currentStep === 0 ? 'secondary' : 'default'"
+                    variant="outlined"
+                    disabled
+                  >
+                    <VIcon
+                      icon="mdi-arrow-left"
+                      start
+                      class="flip-in-rtl"
+                    />
+                    Previous
+                  </VBtn>
 
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="formData.country"
-                  label="Country"
-                  placeholder="Country"
-                  :items="['UK', 'USA', 'Canada', 'Australia', 'Germany']"
-                />
-              </VCol>
-
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="formData.language"
-                  label="Language"
-                  placeholder="Language"
-                  :items="['English', 'Spanish', 'French', 'Russian', 'German']"
-                />
+                  <VBtn
+                    :disabled="!file"
+                    type="submit"
+                  >
+                    Next
+                    <VIcon
+                      icon="mdi-arrow-right"
+                      end
+                      class="flip-in-rtl"
+                    />
+                  </VBtn>
+                </div>
               </VCol>
             </VRow>
-          </VWindowItem>
-
-          <VWindowItem>
+          </VForm>
+        </VWindowItem>
+        <!-- 👉 투스탭 -->
+        <VWindowItem>
+          <VForm ref="refPersonalForm" @submit.prevent="validatePersonalForm">
             <VRow>
               <VCol cols="12">
                 <h6 class="text-sm font-weight-medium">
-                  Social Links
+                  물품을 확인해 주세요
                 </h6>
                 <p class="text-xs mb-0">
-                  Add Social Links
+                  유통기한, 수량, 물품명을 확인해 주세요
                 </p>
               </VCol>
 
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="formData.twitter"
-                  placeholder="https://twitter.com/abc"
-                  label="Twitter"
-                />
+              <VCol cols="12" md="4" >
+                <img v-if="imageSrc" :src="imageSrc" alt="Decoded Image" style="width: 30vh; height: 30vh;">
               </VCol>
 
-              <VCol
-                cols="12"
-                md="6"
+              <VCol cols="12" md="8">
+            <v-data-table  class="elevation-1">
+              <VTable
+                height="250"
+                fixed-header
               >
-                <VTextField
-                  v-model="formData.facebook"
-                  placeholder="https://facebook.com/abc"
-                  label="Facebook"
-                />
-              </VCol>
+                <thead>
+                  <tr>
+                    <th class="text-uppercase">
+                      이름
+                    </th>
+                    <th class="text-uppercase">
+                      수량
+                    </th>
+                    <th class="text-uppercase">
+                      유통기한
+                    </th>
+                    <th>
+                    <p></p>
+                    </th>
+                  </tr>
+                </thead>
 
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="formData.googlePlus"
-                  placeholder="https://plus.google.com/abc"
-                  label="Google+"
-                />
-              </VCol>
+                <tbody>
+                  <tr v-for="(item, i) in results" :key="i">
+                    <td>
+                      <input type="text" v-model="item.name" :rules="nameRules" class="form-control" placeholder="이름을 입력" style="width: 100px;">
+                    </td>
+                    <td>
+                      <input type="number" v-model="item.quantity" :rules="quantityRules" class="form-control" placeholder="수량을 입력" style="width: 100px;">
+                    </td>
+                    <td>
+                      <input type="date" v-model="item.endDate" :rules="dateRules" class="form-control" placeholder="유통기한을 입력" style="width: 100px;">
+                    </td>
+                    <td>
+                      <a href="#" @click="deleteRow(i)">삭제</a>
+                    </td>
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="4">
+                      <a href="#" @click="addRow">추가</a>
+                    </td>
+                  </tr>
+                </tfoot>
+              </VTable>
+            </v-data-table>
+          </VCol>
 
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="formData.linkedIn"
-                  placeholder="https://linkedin.com/abc"
-                  label="LinkedIn"
-                />
+              <VCol cols="12">
+                <div class="d-flex justify-space-between">
+                  <VBtn color="secondary" variant="tonal" @click="currentStep--" >
+                    <VIcon
+                      icon="mdi-chevron-left"
+                      start
+                      class="flip-in-rtl"
+                    />
+                    Previous
+                  </VBtn>
+
+                  <VBtn type="submit">
+                    Next
+                    <VIcon
+                      icon="mdi-chevron-right"
+                      end
+                      class="flip-in-rtl"
+                    />
+                  </VBtn>
+                </div>
               </VCol>
             </VRow>
-          </VWindowItem>
-        </VWindow>
-
-        <div class="d-flex justify-sm-space-between justify-center flex-wrap gap-4 mt-8">
-          <VBtn
-            :color="currentStep === 0 ? 'secondary' : 'default'"
-            variant="outlined"
-            :disabled="currentStep === 0"
-            @click="currentStep--"
+          </VForm>
+        </VWindowItem>
+        <!-- 👉 쓰리스탭 -->
+        <VWindowItem>
+          <VForm
+            ref="refSocialLinkForm"
+            @submit.prevent="validateSocialLinkForm"
           >
-            <VIcon
-              icon="mdi-arrow-left"
-              start
-              class="flip-in-rtl"
-            />
-            Previous
-          </VBtn>
+            <VRow>
+              <VCol cols="12">
+                <h6 class="text-sm font-weight-medium">
+                  등록할 정보를 확인해 주세요
+                </h6>
+              </VCol>
 
-          <VBtn
-            v-if="numberedSteps.length - 1 === currentStep"
-            color="success"
-            append-icon="mdi-check"
-            @click="onSubmit"
-          >
-            submit
-          </VBtn>
+              <VCol cols="12" md="2" />
 
-          <VBtn
-            v-else
-            @click="currentStep++"
-          >
-            Next
+              <VCol cols="12" md="8">
+                              <VTable
+                  height="250"
+                  fixed-header
+                >
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase">
+                        이름
+                      </th>
+                      <th class="text-uppercase">
+                        수량
+                      </th>
+                      <th class="text-uppercase">
+                        유통기한
+                      </th>
+                    </tr>
+                  </thead>
 
-            <VIcon
-              icon="mdi-arrow-right"
-              end
-              class="flip-in-rtl"
-            />
-          </VBtn>
-        </div>
-      </VForm>
+                  <tbody>
+                    <tr v-for="(item, i) in results" :key="i">
+                      <td>
+                        {{ item.name }}
+                      </td>
+                      <td>
+                        {{ item.quantity }}
+                      </td>
+                      <td>
+                        {{ item.endDate }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </VTable>
+              </VCol>
+              <VCol cols="12" md="2" />
+
+              <VCol cols="12">
+                <div class="d-flex justify-space-between">
+                  <VBtn
+                    color="secondary"
+                    variant="tonal"
+                    @click="currentStep--"
+                  >
+                    <VIcon
+                      icon="mdi-chevron-left"
+                      start
+                      class="flip-in-rtl"
+                    />
+                    Previous
+                  </VBtn>
+
+                  <VBtn
+                    color="success"
+                    type="submit"
+                  >
+                    submit
+                  </VBtn>
+                </div>
+              </VCol>
+            </VRow>
+          </VForm>
+        </VWindowItem>
+      </VWindow>
     </VCardText>
   </VCard>
+
+  <v-dialog v-model="dialogVisible" max-width="400">
+    <v-card>
+      <v-card-title class="headline">{{ dialogMessage }}</v-card-title>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="green darken-1" text @click="dialogVisible = false">확인</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
