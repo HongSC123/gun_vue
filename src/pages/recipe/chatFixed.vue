@@ -54,7 +54,7 @@
             </v-btn><br>
 
             <div v-for="(page, index) in totalpage" :key="page">
-              <span v-if="shouldDisplayPage(page)" class="page-number" @click="moveToPage(page)">
+              <span v-if="shouldDisplayPage(page)" :class="{ 'page-number': true, 'bold-page': page === currentPage }" @click="moveToPage(page)">
                 {{ page }}
               </span>
               <span v-if="shouldDisplayPage(page) && index !== totalpage.length - 1" class="space-between"></span>
@@ -148,8 +148,28 @@
 
     this.contentlist = response.data;
     console.log('응답 데이터:', response.data);
+
+    await this.getFindCount();
+    
   } catch (error) {
     console.error('검색 요청 에러:', error);
+  }
+},
+async getFindCount() {
+  try {
+    const response = await axios.get(`http://localhost:8888/chatfindcount?memEmail=${this.memEmail}`, {
+      params: {
+        boardnum: this.$route.params.id,
+      }
+    });
+
+    this.cnt = response.data;
+    console.log('검색 결과 카운트:', response.data);
+
+  } catch (error) {
+    console.error('검색 결과 카운트 가져오기 에러:', error);
+    // 에러가 발생한 경우 처리 (예: 에러 메시지를 사용자에게 표시)
+    alert('검색 결과 카운트를 가져오는 중 에러가 발생했습니다.');
   }
 },
 async toggleChatFixChange(item) {
@@ -258,5 +278,8 @@ async toggleChatFixChange(item) {
 .space-between {
   display: inline-block;
   width: 10px; 
+}
+.bold-page {
+  font-weight: bold;
 }
   </style>
