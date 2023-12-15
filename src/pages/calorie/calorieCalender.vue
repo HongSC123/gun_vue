@@ -38,29 +38,50 @@ const selectionDate = ref('');
 
 // 달력에서 이벤트를 클릭했을 때 호출되는 핸들러 함수
 const handleEventClick = clickInfo => {
-  // 클릭한 이벤트의 날짜 가져오기
-  const clickedDate = clickInfo.event.start;
+// 클릭한 이벤트의 날짜 가져오기
+const clickedDate = clickInfo.event.start;
 
-  // 서버에서 데이터 조회
-  fetchDataFromServer(clickedDate);
+// 날짜를 원하는 형식으로 변환
+const FormattedDate = clickedDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+console.log("clickInfo : " + clickInfo)
+  // year, month, day 변수에 각각 할당
+const month = FormattedDate.split('/')[0];
+const day = FormattedDate.split('/')[1];
+const year = FormattedDate.split('/')[2];
+
+const clickFormattedDate = `${year}-${month}-${day}`
+
+  console.log("포맷한 날짜 : " + clickFormattedDate);
+  this.$router.push({
+    name : "/calorieDetail", 
+    query: { "data" : clickFormattedDate }
+  })
+
 }
 
-const fetchDataFromServer = async date => {
+const fetchDataFromServer = async selection_date => {
   try {
-    // 여기에서 서버에서 데이터를 조회하고 필요한 처리를 수행
-    const memEmail = sessionStorage.getItem("memEmail");
-    const mem_email = "kiqbbq78@naver.com";
-    const response = await axios.get(`/caloriedetail/${mem_email}/${date}`);
+    // 서버에서 데이터를 조회하고 필요한 처리를 수행
+    const mem_email = sessionStorage.getItem("memEmail");
+    const response = await axios.get(`/caloriedetail/${mem_email}/${selection_date}`);
     
     // 조회된 데이터를 콘솔에 출력
     console.log('%c서버에서 조회한 데이터:', 'color: green; font-weight: bold', response.data);
-
+ 
+    // router.push({ 
+    //   name : "calorieDetail", 
+    //   query: { "data" : response.data }
+    // });
     // 조회된 데이터와 함께 페이지 이동
-    router.push({ 
-      name: 'calender-detail', 
-      params: { mem_email, selectionDate: date },
-      query: { data: response.data } // 데이터를 쿼리로 전달
-    });
+    // router.push({ 
+    //   name: 'calenderDetail', 
+    //   params: { mem_email, selectionDate: selection_date },
+    //   query: { data: response.data } // 데이터를 쿼리로 전달
+    // });
   } catch (error) {
     console.error('%c서버와 통신 중 오류 발생:', 'color: red; font-weight: bold', error);
   }
@@ -93,7 +114,7 @@ const handleDatesSet = (info) => {
   const yyyy_mm = `${year}-${month}`;
   
   // 콘솔에 출력합니다.
-  console.log('현재 년월일:', yyyy_mm);
+  console.log('현재 년월일 : ', yyyy_mm);
 
   currentMonth.value = yyyy_mm;
   
@@ -106,9 +127,8 @@ const handleDatesSet = (info) => {
 
 const sendDataToServer = async (info, yyyy_mm) => {
   try {
-    const memEmail = sessionStorage.getItem("memEmail");
-    const mem_email = "kiqbbq78@naver.com";
-
+    const mem_email = sessionStorage.getItem("memEmail");
+    console.log("회원 이메일 : " + mem_email);
     const response = await axios.get(`/caloriedaylist/${mem_email}/${yyyy_mm}`);
     const calorieData = response.data;
     
