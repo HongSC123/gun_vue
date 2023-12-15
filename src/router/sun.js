@@ -4,6 +4,7 @@ import AdminLogin from '@/pages/admin/adminLogin.vue'
 import AdminRegister from '@/pages/admin/adminRegister.vue'
 import Login from '@/pages/login.vue'
 import AccoutSettings from '@/pages/member/AccountSettingsAccount.vue'
+import FaceLogin from '@/pages/member/FaceLogin.vue'
 import KakaoLogin from '@/pages/member/kakaologin.vue'
 
 const sun = [{
@@ -40,6 +41,11 @@ const sun = [{
   path: '/adminRegister',
   name: 'AdminRegister',
   component: AdminRegister,
+},
+{
+  path: '/faceLogin',
+  name: 'FaceLogin',
+  component: FaceLogin,
 }]
 
 export default sun
