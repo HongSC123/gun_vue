@@ -39,7 +39,7 @@
                 <td  @click="movetocontent(item.chat_num)">{{item.chat_title}}</td>
                 <td>{{item.chat_date}}</td>
                 <td @click="toggleChatFixChange(item)">
-                  <v-btn @click.stop="toggleChatFixChange(item)" icon color="green">
+                  <v-btn @click.stop="toggleChatFixChange(item)" icon color="info">
                     <v-icon>{{ item.chat_fix === 'N' ? 'mdi-pin' : 'mdi-done' }}</v-icon>
                   </v-btn>
                 </td>
@@ -55,7 +55,7 @@
   </v-btn><br>
 
   <div v-for="(page, index) in totalpage" :key="page">
-    <span v-if="shouldDisplayPage(page)" class="page-number" @click="moveToPage(page)">
+    <span v-if="shouldDisplayPage(page)" :class="{ 'page-number': true, 'bold-page': page === currentPage }" @click="moveToPage(page)">
       {{ page }}
     </span>
     <span v-if="shouldDisplayPage(page) && index !== totalpage.length - 1" class="space-between"></span>
@@ -137,7 +137,7 @@ axios.get(`http://localhost:8888/chatcount?memEmail=${this.memEmail}`, {
   console.log('Search method called!');
   console.log('Search Term:', this.searchTerm);
   console.log('Email:', this.memEmail);
-  
+
   try {
     const response = await axios.get(`http://localhost:8888/search`, {
       params: {
@@ -148,8 +148,32 @@ axios.get(`http://localhost:8888/chatcount?memEmail=${this.memEmail}`, {
 
     this.contentlist = response.data;
     console.log('응답 데이터:', response.data);
+
+    // 검색 결과에 대한 카운트 가져오기
+    await this.getSearchCount();
+
   } catch (error) {
     console.error('검색 요청 에러:', error);
+    // 에러가 발생한 경우 처리 (예: 에러 메시지를 사용자에게 표시)
+    alert('검색 중 에러가 발생했습니다.');
+  }
+},
+
+async getSearchCount() {
+  try {
+    const response = await axios.get(`http://localhost:8888/chatsearchcount?memEmail=${this.memEmail}`, {
+      params: {
+        boardnum: this.$route.params.id,
+      }
+    });
+
+    this.cnt = response.data;
+    console.log('검색 결과 카운트:', response.data);
+
+  } catch (error) {
+    console.error('검색 결과 카운트 가져오기 에러:', error);
+    // 에러가 발생한 경우 처리 (예: 에러 메시지를 사용자에게 표시)
+    alert('검색 결과 카운트를 가져오는 중 에러가 발생했습니다.');
   }
 },
 
@@ -237,5 +261,8 @@ async toggleChatFixChange(item) {
 .space-between {
   display: inline-block;
   width: 10px; 
+}
+.bold-page {
+  font-weight: bold;
 }
 </style>
