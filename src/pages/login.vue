@@ -246,12 +246,14 @@ const loginface = () => {
                   <VBtn
                     block
                     type="submit"
+                    style="margin-bottom: 10px;"
                   >
                     Login
                   </VBtn>
                   <VBtn
                     block
                     @click="loginface"
+                    style="margin-bottom: 10px;"
                   >
                     안면인식
                   </VBtn>

@@ -86,7 +86,6 @@ const optionSave = async () => {
   formData.append('memActLevel', mapActivityToFloat(accountDataLocal.value.memActLevel))
   formData.append('memEmail', memEmail)
 
-  sessionStorage.removeItem('memEmail')
 
   try {
     const response = await axios.post('/memoption', formData, {
@@ -103,7 +102,7 @@ const optionSave = async () => {
 
     console.log(response)
 
-    router.push("/login")
+    router.push("/")
 
   } catch (error) {
     console.error(error)
@@ -126,10 +125,6 @@ onMounted(() => {
     })
 })
 
-onBeforeMount(() => {
-  sessionStorage.removeItem('memEmail')
-})
-
 const mapActivityToFloat = activity => {
   const mappingTable = {
     '비 활동적': 1.25,
@@ -150,10 +145,18 @@ const mapActivityToFloat = activity => {
         <VCardText class="d-flex">
           <!-- 👉 Avatar -->
           <VAvatar
+            v-show="accountDataLocal.memPhoto"
             rounded="sm"
             size="120"
             class="me-6"
             :image="'http://127.0.0.1:8080/'+accountDataLocal.memPhoto"
+          />
+          <VAvatar
+            v-show="!accountDataLocal.memPhoto"
+            rounded="sm"
+            size="120"
+            class="me-6"
+            :image="avatar1"
           />
 
           <!-- 👉 Upload Photo -->
