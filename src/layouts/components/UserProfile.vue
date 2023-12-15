@@ -79,6 +79,11 @@ const tokenCheck = () => {
     })
 }
 
+const adminList = () => {
+  router.push("/admin")
+}
+
+
 const userData = ref(null)
 
 onMounted(async () => {
@@ -263,7 +268,20 @@ onMounted(async () => {
                 size="22"
               />
             </template>
-            <VListItemTitle>Token</VListItemTitle>
+            <VListItemTitle>토큰확인</VListItemTitle>
+          </VListItem>
+          <VListItem 
+            v-if="role === 'ADMIN'"
+            @click="adminList"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="mdi-login"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>회원관리</VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>
