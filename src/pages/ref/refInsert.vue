@@ -22,15 +22,13 @@ const numberedSteps = [
 
 const nameRules = [
   v => !!v || '이름을 입력해주세요.',
-];
+]
 const quantityRules = [
   v => v > 0 || '수량은 1 이상이어야 합니다.',
-];
+]
 const dateRules = [
   v => new Date(v) >= new Date() || '유통기한은 오늘 날짜 이후여야 합니다.',
-];
-
-
+]
 
 const imageSrc = ref('')
 const currentStep = ref(0)
@@ -41,12 +39,14 @@ const refSocialLinkForm = ref()
 const dialogVisible = ref(false)
 const dialogMessage = ref('')
 
+const file = ref(null)
+const rules = [fileList => !fileList || !fileList.length || fileList[0].size < 10000000 || '파일 용량 제한 10 MB!']
+
 const results = ref([])
 const detectPhoto = async () => {
   const valid = await refAccountForm.value?.validate()
   if (valid.valid) {
-    const formData = new FormData()
-
+    let formData = new FormData()
     formData.append('image_file', file.value[0])
 
     console.log('file.value[0]:', file.value[0])
@@ -105,21 +105,12 @@ const validatePersonalForm = () => {
       }
     };
 
-const validateSocialLinkForm = () => {
-  refSocialLinkForm.value?.validate().then(valid => {
-    if (valid.valid) {
-      isCurrentStepValid.value = true
-    } else {
-      isCurrentStepValid.value = false
-    }
-  })
-}
 const endDate = ref(end_date());
 
 function end_date() {
   const today = new Date();
   today.setDate(today.getDate() + 7);
-  return today.toISOString().substr(0, 10); // yyyy-MM-dd
+  return today.toISOString().substr(0, 10);
 }
 
 const addRow = () => {
@@ -134,8 +125,28 @@ const deleteRow = (index) => {
   results.value.splice(index, 1);
 };
 
-const file = ref(null)
-const rules = [fileList => !fileList || !fileList.length || fileList[0].size < 10000000 || '파일 용량 제한 10 MB!']
+const handleSubmit = async () => {
+  let data = null;
+  let submitData =  new FormData();
+  results.value.forEach((result) => {
+    submitData.append('REF_EXNAME', result.name)
+    submitData.append('REF_QUAN', result.quantity)
+    submitData.append('REF_END_DATE', result.endDate)
+    submitData.append('REF_PHOTO', imageSrc.value)
+    submitData.append('MEM_EMAIL', sessionStorage.getItem('memEmail'))
+    console.log('sessionStorage.getItem(memEmail):', sessionStorage.getItem('memEmail'))
+  })
+  console.log('submitData:', [...submitData.entries()].length)
+
+  try {
+    data = await axios.post('/ref/insert', submitData);
+    console.log(data.data);
+
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 </script>
 
 <template>
@@ -311,7 +322,7 @@ const rules = [fileList => !fileList || !fileList.length || fileList[0].size < 1
         <VWindowItem>
           <VForm
             ref="refSocialLinkForm"
-            @submit.prevent="validateSocialLinkForm"
+            @submit.prevent="handleSubmit"
           >
             <VRow>
               <VCol cols="12">
