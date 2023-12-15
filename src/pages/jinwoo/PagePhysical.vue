@@ -45,13 +45,13 @@
         offset-sm="2"
       >
         <VCardText>
-          1장씩 업로드 해주세요.
+          1장씩 업로드 해주세요. (.jpg)
         </VCardText>
         <VFileInput
           show-size
           label="사진 올리기"
           variant="underlined"
-          @change="onFileInputChange"
+          @change="changePhoto"
         />
       </VCol>
     </vcard>
@@ -59,7 +59,13 @@
 </template>
 
 <script setup>
-import axios from 'e:/gun_workspace/gun_vue/node_modules/axios/index'
+import axios from "axios"
+
+const accountData = {
+  memPhysical: " ",
+}
+
+const accountDataLocal = ref(structuredClone(accountData))
 
 let sequence = 1 // 전역 변수로 시퀀스를 초기화
 
@@ -71,18 +77,31 @@ function dataURItoBlob(dataURI) {
     ia[i] = byteString.charCodeAt(i)
   }
 
-  return new Blob([ab], { type: 'image/png' })
+  return new Blob([ab], { type: 'image/jpeg' })
 }
 
 const changePhoto = file => {
+  console.log("changePhoto")
+
   const fileReader = new FileReader()
-  const { files } = file
+  const { files } = file.target
+
+  console.log("fileReader" + fileReader)
+  console.log("file"+ file)
+
+  console.log(files && files.length)
+
   if (files && files.length) {
+    console.log("changePhoto file reader")
     fileReader.readAsDataURL(files[0])
     fileReader.onload = () => {
       if (typeof fileReader.result === 'string') {
-        const filename = sequence++
+        console.log("changePhoto file result: ")
 
+        const filename = sequence + '.jpg'
+
+
+        
         accountDataLocal.value.memPhysical = fileReader.result
         uploadImage(fileReader.result, filename)
       }
@@ -91,13 +110,14 @@ const changePhoto = file => {
 }
 
 const uploadImage = async (dataURI, filename) => {
+  console.log("uploadImage")
   try {
     const formData = new FormData()
     const file = dataURItoBlob(dataURI)
 
     formData.append('memPhysical', file, filename)
 
-    const response = await axios.post("/memPhysical/insert", formData)
+    const response = axios.post("/memPhysical/insert", formData)
 
     console.log(response)
     console.log(response.data)

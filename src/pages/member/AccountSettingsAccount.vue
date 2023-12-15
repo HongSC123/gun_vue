@@ -101,10 +101,10 @@ onBeforeMount(() => {
 
 const mapActivityToFloat = activity => {
   const mappingTable = {
-    '비 활동적': 1.25,
-    '일반/보통': 1.27,
-    '활동적': 1.29,
-    '매우 활동적': 1.30,
+    '비 활동적': 1.30,
+    '일반/보통': 1.50,
+    '활동적': 1.70,
+    '매우 활동적': 1.90,
   }
 
   
