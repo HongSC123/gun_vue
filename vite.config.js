@@ -76,4 +76,5 @@ export default defineConfig({
       './src/**/*.vue',
     ],
   },
+  
 })

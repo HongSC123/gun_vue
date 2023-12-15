@@ -87,6 +87,9 @@ const adminList = () => {
 const userData = ref(null)
 
 onMounted(async () => {
+  
+  window.location.go(0)
+
   if (accessToken) {
     try {
       const response = await axios.get('/profile')
@@ -114,7 +117,7 @@ onMounted(async () => {
       variant="tonal"
     >
       <VImg
-        v-if="userData.memPhoto"
+        v-if="userData && userData.memPhoto"
         :src="'http://127.0.0.1:8080/'+userData.memPhoto"
       />
       <VImg
@@ -149,8 +152,8 @@ onMounted(async () => {
                     variant="tonal"
                   >
                     <img
-                      v-if="userData.memPhoto"
-                      :src="'http://127.0.0.1:8080/'+userData.memPhoto"
+                      v-if="userData && userData.memPhoto"
+                      :src="'http://127.0.0.1:8080/'+ userData.memPhoto"
                       
                       alt="프로필"
                       style="width: 24px; height: 24px;"

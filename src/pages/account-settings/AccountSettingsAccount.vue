@@ -76,19 +76,32 @@ const next = () => {
 const optionSave = async () => {
   const formData = new FormData()
 
-  const memPhotoFile = dataURItoBlob(accountDataLocal.value.memPhoto)
+  console.log(accountDataLocal.value.memPhoto)
 
-  formData.append('memPhoto', memPhotoFile, 'avatar.png')
+  // Check if memPhoto is a URL or base64 data
+  const isURL = accountDataLocal.value.memPhoto.startsWith('http')
+
+  if (!isURL) {
+    // If memPhoto is not a URL, convert it to Blob
+    const memPhotoFile = dataURItoBlob(accountDataLocal.value.memPhoto)
+
+    formData.append('memPhoto', memPhotoFile, 'avatar.png')
+  } else {
+    // If memPhoto is a URL, append it directly
+    formData.append('memPhoto', accountDataLocal.value.memPhoto)
+  }
+
   formData.append('memGen', accountDataLocal.value.memGen)
   formData.append('memWeight', accountDataLocal.value.memWeight)
   formData.append('memHeight', accountDataLocal.value.memHeight)
   formData.append('memBir', accountDataLocal.value.memBir)
-  formData.append('memActLevel', mapActivityToFloat(accountDataLocal.value.memActLevel))
+  formData.append('memActLevel', parseFloat(accountDataLocal.value.memActLevel))
   formData.append('memEmail', memEmail)
 
+  console.log("******************", formData)
 
   try {
-    const response = await axios.post('/memoption', formData, {
+    const response = await axios.post('/memoption2', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -112,7 +125,7 @@ const optionSave = async () => {
 onMounted(() => {
   axios.get('/profile')
     .then(response => {
-      accountDataLocal.value.memPhoto = response.data.memPhoto
+      accountDataLocal.value.memPhoto = 'http://127.0.0.1:8080/'+ response.data.memPhoto
       accountDataLocal.value.memGen = response.data.memGen
       accountDataLocal.value.memWeight = response.data.memWeight
       accountDataLocal.value.memHeight = response.data.memHeight
@@ -127,10 +140,10 @@ onMounted(() => {
 
 const mapActivityToFloat = activity => {
   const mappingTable = {
-    '비 활동적': 1.25,
-    '일반/보통': 1.27,
-    '활동적': 1.29,
-    '매우 활동적': 1.30,
+    '비 활동적': 1.30,
+    '일반/보통': 1.50,
+    '활동적': 1.70,
+    '매우 활동적': 1.90,
   }
 
   return mappingTable[activity]
@@ -149,7 +162,7 @@ const mapActivityToFloat = activity => {
             rounded="sm"
             size="120"
             class="me-6"
-            :image="'http://127.0.0.1:8080/'+accountDataLocal.memPhoto"
+            :image="accountDataLocal.memPhoto"
           />
           <VAvatar
             v-show="!accountDataLocal.memPhoto"
@@ -158,6 +171,7 @@ const mapActivityToFloat = activity => {
             class="me-6"
             :image="avatar1"
           />
+          
 
           <!-- 👉 Upload Photo -->
           <form class="d-flex flex-column justify-center gap-4">
@@ -264,7 +278,7 @@ const mapActivityToFloat = activity => {
                   v-model="accountDataLocal.memActLevel"
                   clearable
                   label="활동량"
-                  :items="['비 활동적', '일반/보통','활동적','매우 활동적']"
+                  :items="mappingTable"
                 />
               </VCol>
               <!-- 👉 Form Actions -->
