@@ -8,7 +8,7 @@ const axiosIns = axios.create({
   // 여기에 헤더 등을 추가하세요
   // ================================
   baseURL: 'http://localhost:8888',
-  timeout: 1000,
+  timeout: 100000,
   headers: {
     'Content-Type': 'application/json',
   },
