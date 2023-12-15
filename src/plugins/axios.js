@@ -37,12 +37,12 @@ axiosIns.interceptors.request.use(config => {
     //config.headers.Authorization = token ? `Bearer ${JSON.parse(token)}` : ''
     if(loginType === 'KAKAO'){
       config.headers.Authorization = `Kakao ${token}`
-      config.headers['memEmail'] = `${sessionStorage.getItem('memEmail')}`
     }else{
       config.headers.Authorization = `Bearer ${token}`
     }
     
-
+    config.headers['memEmail'] = `${sessionStorage.getItem('memEmail')}`
+    
     // 리프레시 토큰을 요청 헤더에 추가합니다.
     config.headers['refresh'] = `${refresh}`
     

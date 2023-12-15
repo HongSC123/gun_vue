@@ -116,8 +116,9 @@ const uploadImage = async (dataURI, filename) => {
     const file = dataURItoBlob(dataURI)
 
     formData.append('memPhysical', file, filename)
-
+    formData.append('memEmail', sessionStorage.getItem("memEmail"))
     const response = axios.post("/memPhysical/insert", formData)
+    console.log("1")
 
     console.log(response)
     console.log(response.data)
