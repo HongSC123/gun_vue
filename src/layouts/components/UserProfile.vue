@@ -12,13 +12,13 @@ const loginType = sessionStorage.getItem('loginType')
 const accessToken = sessionStorage.getItem('accessToken')
 const role = sessionStorage.getItem('role')
 
-console.log(loginType)
-console.log(accessToken)
+// console.log(loginType)
+// console.log(accessToken)
 
 const showLogout = ref(!!accessToken)
 const showLogin = ref(!showLogout.value)
 
-console.log(showLogout.value, showLogin.value)
+// console.log(showLogout.value, showLogin.value)
 
 const logout = () => {
   const accessToken = sessionStorage.getItem('accessToken')
@@ -41,7 +41,6 @@ const logout = () => {
           },
         })
 
-
         // kakao.value.Auth.logout()
       } catch (error) {
         console.error('로그아웃 시도 중 오류 발생:', error)
@@ -57,7 +56,7 @@ const logout = () => {
       // 로그아웃 시에 실행할 코드
       axios.defaults.headers.common['Authorization'] = 'logout'
       
-      console.log(axios.defaults.headers.common['Authorization'])
+      //  console.log(axios.defaults.headers.common['Authorization'])
 
       // console.log("response", r)
       showLogout.value = false
@@ -87,8 +86,6 @@ const adminList = () => {
 const userData = ref(null)
 
 onMounted(async () => {
-  
-  window.location.go(0)
 
   if (accessToken) {
     try {

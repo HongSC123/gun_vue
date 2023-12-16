@@ -16,12 +16,18 @@ const baseRoutes = [
     to: { name: 'PageBmi' },
     icon: { icon: 'mdi-calculator-variant-outline' },
   },
+  {
+    title: '공지사항',
+    to: 'notice-noticeList',
+    icon: { icon: 'mdi-bulletin-board' },
+  },
   ...jinwoo,
   ...ref,
   ...recipe,
   ...calorie,
 
 ]
+
 if(sessionStorage.getItem('loginType') === 'ADMIN'){
   baseRoutes.push(...admin)
 }
