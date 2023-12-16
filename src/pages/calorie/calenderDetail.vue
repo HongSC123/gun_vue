@@ -38,7 +38,7 @@
 // let calorieData = response.data;
 const mem_email = sessionStorage.getItem("memEmail");
       const selection_date = "1212-13-14";
-console.log("가져온 데이터 : " + mem_email + ", " + selection_date)
+// console.log("가져온 데이터 : " + mem_email + ", " + selection_date)
 import axios from 'axios'
 
 export default {

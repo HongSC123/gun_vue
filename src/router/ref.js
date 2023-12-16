@@ -20,7 +20,7 @@ const ref = [
       },
       { path: '/refInsert',
         name: 'refInsert',
-        component: refInsert 
+        component: refInsert, 
       },
     ],
   },
