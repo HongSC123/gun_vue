@@ -21,7 +21,7 @@
           >
         </VCol>
         <!-- 측면 -->
-        <VCol
+        <!-- <VCol
           md="4"
           cols="12"
           offset-sm="2"
@@ -29,13 +29,13 @@
           <VCardText>
             측면
           </VCardText>
-          <!-- 측면 이미지 -->
-          <img
+          <-- 측면 이미지 -->
+          <!-- <img
             src="@images/images/bodysilhouette.png"
             alt="측면 이미지"
             style="width: 280px; height: 280px;"
-          >
-        </VCol>
+          > -->
+        <!-- </VCol> --> 
       </VRow>
       <VDivider />
       <VCol
@@ -45,7 +45,7 @@
         offset-sm="2"
       >
         <VCardText>
-          1장씩 업로드 해주세요. (.jpg)
+          1장만 업로드 해주세요. (.jpg)
         </VCardText>
         <VFileInput
           show-size

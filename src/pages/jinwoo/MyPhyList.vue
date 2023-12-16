@@ -1,76 +1,68 @@
 <script setup>
-const desserts = [
-  {
-    dessert: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Ice cream sandwich',
-    calories: 237,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Eclair',
-    calories: 262,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Cupcake',
-    calories: 305,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Gingerbread',
-    calories: 356,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Ice cream sandwich',
-    calories: 237,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Eclair',
-    calories: 262,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Cupcake',
-    calories: 305,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-  {
-    dessert: 'Gingerbread',
-    calories: 356,
-    fat: 6,
-    carbs: 24,
-    protein: 4,
-  },
-]
+import axios from "@axios"
+import { ref, onMounted } from "vue"
+
+const partNames = {
+  ear: "머리",
+  shoulder: "어깨",
+  hip: "골반",
+  knee: "무릎",
+}
+
+ // 데이터 초기화
+const data = ref({
+  items: [
+    {
+      physicalNum: "",
+      inputDate: "",
+      location: "",
+      point: {},
+    },
+  ],
+})
+
+
+const email = sessionStorage.getItem("memEmail")
+
+//Point 정보 가공
+const formatMeasurement = (part, value) => {
+  // value가 undefined 또는 null인 경우에 대한 기본값 설정
+  console.log(value, part)
+  
+  const formattedValue = Math.abs(parseFloat(value)).toFixed(2) // 소수점 2자리까지 표기
+  if (value < 0) {
+    return `${partNames[part]} :  ${formattedValue} 왼쪽으로 기울어졌습니다.`
+  } else {
+    return `${partNames[part]} :  ${formattedValue} 오른쪽으로 기울어졌습니다.`
+  }
+}
+
+//컴포넌트가 마운트될 때 데이터 불러오는 함수
+const physicalFromBoot = async () => {
+  try {
+    const response = await axios.post("/list/physical")
+    if (response) {
+      console.log(response.data, "배열")
+       
+      // 받아온 데이터를 data.items에 할당
+      data.value.items = response.data || []
+      console.log(data.value.items, "아이템")
+
+    } else {
+      console.error("응답 데이터가 없음")
+    }
+
+  } catch(error) {
+    console.error("측정정보 불러오기 실패", error)
+  }
+}
+  
+//컴포넌트가 마운트되면 데이터를 가져옴
+onMounted(()=>{
+  physicalFromBoot()
+})
+
+
 </script>
 
 <template>
@@ -78,44 +70,43 @@ const desserts = [
     <thead>
       <tr>
         <th class="text-uppercase">
-          Desserts(100g Servings)
+          No
         </th>
         <th class="text-uppercase">
-          calories
+          date
         </th>
         <th class="text-uppercase">
-          Fat(g)
+          location
         </th>
         <th class="text-uppercase">
-          Carbs(g)
-        </th>
-        <th class="text-uppercase">
-          protein(g)
+          info
         </th>
       </tr>
     </thead>
 
     <tbody>
       <tr
-        v-for="item in desserts"
-        :key="item.dessert"
+        v-for="(item, index) in data.items" 
+        :key="index"
       >
         <td>
           <!-- 이름 클릭 시 페이지 이동 처리 -->
          
-          {{ item.dessert }}
+          {{ item.physicalNum }}        
         </td>
         <td>
-          {{ item.calories }}
+          {{ item.inputDate }}
         </td>
         <td>
-          {{ item.fat }}
+          {{ item.location }}
         </td>
-        <td>
-          {{ item.carbs }}
+        <!-- item.point가 객체인 경우, 객체 내의 속성을 표시 -->
+        <td v-if="item.point && typeof item.point === 'object' && Object.keys(item.point).length > 0">
+          {{ item.point.ear }}, {{ item.point.shoulder }}, {{ item.point.hip }}, {{ item.point.knee }}
         </td>
-        <td>
-          {{ item.protein }}
+        <!-- item.point가 빈 객체 또는 null/undefined인 경우 -->
+        <td v-else>
+          No data
         </td>
       </tr>
     </tbody>
@@ -125,14 +116,14 @@ const desserts = [
     block
     color="info"
     variant="tonal"
-    :to="{path: 'myphycompare'}"
+    :to="{path: 'pagephysical'}"
     class="mt-4" 
     size="large"
   >
-    체형정보 비교하기
+    체형정보 측정하기
     <VIcon 
       end
-      icon="mdi-compare-horizontal"
+      icon="mdi-camera-outline"
     />
   </VBtn>
 </template>
