@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import ChatFixed from '@/pages/recipe/ChatFixed.vue'
 import ChatRecent from '@/pages/recipe/ChatRecent.vue'
+import calorieDetail from '@/pages/calorie/calenderDetail.vue'
 import routes from '~pages'
 import admin from './admin'
 import jinwoo from './jinwoo'
@@ -21,6 +22,11 @@ const additionalRoutes = [
     path: '/recipe/chatdfixed',
     name: 'ChatFixed',
     component: ChatFixed,
+  },
+  {
+    path: '/calorie/calenderdetail',
+    name: 'calorieDetail',
+    component: calorieDetail,
   },
 ]
 
