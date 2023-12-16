@@ -7,7 +7,6 @@ const recipe = [
     heading: '레시피',
     path: '/pages/recipe',
     children: [
-      
       {
         path: '/chatfixed',
         name: 'chatFixed',

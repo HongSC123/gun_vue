@@ -8,6 +8,7 @@ import admin from './admin'
 import jinwoo from './jinwoo'
 import sun from './sun'
 import calorie from './calorie'
+import ref from './ref'
 
 
 const additionalRoutes = [
@@ -31,6 +32,7 @@ const router = createRouter({
     ...additionalRoutes,
     ...admin,
     ...calorie,
+    ...ref,
   ],
   ...jinwoo,
 })
