@@ -1,10 +1,11 @@
-import admin from './admin'
+
 import jinwoo from './jinwoo'
 import recipe from './recipe'
 import ref from './ref'
 import calorie from './calorie'
+import admin from './admin'
 
-export default [
+const baseRoutes = [
   {
     title: 'Home',
     to: { name: 'index' },
@@ -18,9 +19,13 @@ export default [
   ...jinwoo,
   ...ref,
   ...recipe,
-  ...admin,
   ...calorie,
 
 ]
+if(sessionStorage.getItem('loginType') === 'ADMIN'){
+  baseRoutes.push(...admin)
+}
+
+export default baseRoutes 
 
 

@@ -2,12 +2,15 @@ import calorieDetail from '@/pages/calorie/calenderDetail.vue'
 
 const calorie = [ 
     {
-    path: '/caloriedetail/:mem_email/:selection_date',
-    name: 'calorieDetail',
-    component: calorieDetail,
-    },
-
-
+        heading: '칼로리',
+        path: '/pages/calorie',
+        children: [
+            {
+            path: '/calenderdetail',
+            name: 'calorieDetail',
+            component: calorieDetail,
+            },
+        ],
+    }
 ]
-
 export default calorie

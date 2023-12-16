@@ -1,29 +1,31 @@
 <template>
-    <!-- <div class="large-image">
-      <img src="@/assets/images/maintitle.png" alt="Main Title">
-    </div> -->
-  <div>
-    <v-row>
-      <v-col v-for="(image, index) in images" :key="index" cols="3">
-        <VCard
-        @mouseenter="toggleImageAndText(index, true)"
-          @mouseleave="toggleImageAndText(index, false)"
-          class="card-container"
-        >
-          <div class="image-container">
-            <div class="image-wrapper">
-              <img :src="getImagePath(image)" :alt="'Image ' + index + ' description'" class="hover-image">
-              <div class="text-overlay" v-show="revealedIndex === index">
-                <span class="overlay-text">
-                  {{ texts[index] }}
-                </span>
-              </div>
+
+  <!-- <div class="large-image">
+    <img src="@/assets/images/maintitle.png" alt="Main Title">
+  </div> -->
+<div>
+  <v-row>
+    <v-col v-for="(image, index) in images" :key="index" cols="3">
+      <VCard
+      @mouseenter="toggleImageAndText(index, true)"
+        @mouseleave="toggleImageAndText(index, false)"
+        class="card-container"
+      >
+        <div class="image-container">
+          <div class="image-wrapper">
+            <img :src="getImagePath(image)" :alt="'Image ' + index + ' description'" class="hover-image">
+            <div class="text-overlay" v-show="revealedIndex === index">
+              <span class="overlay-text">
+                {{ texts[index] }}
+              </span>
             </div>
           </div>
-        </VCard>
-      </v-col>
-    </v-row>
-  </div>
+        </div>
+      </VCard>
+    </v-col>
+  </v-row>
+</div>
+
 </template>
 
 <script>
@@ -33,6 +35,7 @@ import image5 from '@/assets/images/5.jpg';
 import image7 from '@/assets/images/7.jpg';
 
 export default {
+
   data() {
     return {
       images: [image9, image6, image5, image7],
@@ -67,6 +70,7 @@ export default {
 
 <style scoped>
 .card-container {
+
   cursor: pointer;
 }
 

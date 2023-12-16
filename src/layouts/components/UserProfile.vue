@@ -79,9 +79,17 @@ const tokenCheck = () => {
     })
 }
 
+const adminList = () => {
+  router.push("/admin")
+}
+
+
 const userData = ref(null)
 
 onMounted(async () => {
+  
+  window.location.go(0)
+
   if (accessToken) {
     try {
       const response = await axios.get('/profile')
@@ -109,7 +117,7 @@ onMounted(async () => {
       variant="tonal"
     >
       <VImg
-        v-if="userData.memPhoto"
+        v-if="userData && userData.memPhoto"
         :src="'http://127.0.0.1:8080/'+userData.memPhoto"
       />
       <VImg
@@ -144,8 +152,8 @@ onMounted(async () => {
                     variant="tonal"
                   >
                     <img
-                      v-if="userData.memPhoto"
-                      :src="'http://127.0.0.1:8080/'+userData.memPhoto"
+                      v-if="userData && userData.memPhoto"
+                      :src="'http://127.0.0.1:8080/'+ userData.memPhoto"
                       
                       alt="프로필"
                       style="width: 24px; height: 24px;"
@@ -263,7 +271,20 @@ onMounted(async () => {
                 size="22"
               />
             </template>
-            <VListItemTitle>Token</VListItemTitle>
+            <VListItemTitle>토큰확인</VListItemTitle>
+          </VListItem>
+          <VListItem 
+            v-if="role === 'ADMIN'"
+            @click="adminList"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="mdi-login"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>회원관리</VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>

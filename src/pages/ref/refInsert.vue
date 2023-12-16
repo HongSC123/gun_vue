@@ -2,6 +2,8 @@
 import axios from '@axios';
 import { ref } from 'vue';
 import { VForm } from 'vuetify/components/VForm';
+import { useRouter } from 'vue-router'
+
 
 axios.defaults.timeout = 0
 
@@ -30,6 +32,8 @@ const dateRules = [
   v => new Date(v) >= new Date() || '유통기한은 오늘 날짜 이후여야 합니다.',
 ]
 
+const router = useRouter()
+const image = ref('')
 const imageSrc = ref('')
 const currentStep = ref(0)
 const isCurrentStepValid = ref(true)
@@ -37,7 +41,9 @@ const refAccountForm = ref()
 const refPersonalForm = ref()
 const refSocialLinkForm = ref()
 const dialogVisible = ref(false)
+const axiosdialog = ref(false)
 const dialogMessage = ref('')
+const axiosMessage = ref('')
 
 const file = ref(null)
 const rules = [fileList => !fileList || !fileList.length || fileList[0].size < 10000000 || '파일 용량 제한 10 MB!']
@@ -53,12 +59,13 @@ const detectPhoto = async () => {
     console.log('formData:', formData)
 
     try {
-      const response = await axios.post('http://43.201.53.18:8000/detectFruits', formData, {
+      const response = await axios.post('http://43.200.244.34:8000/detectFruits', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       })
       console.log('response.data:', response.data)
+      image.value = response.data.image
       imageSrc.value = 'data:image/jpeg;base64,' + response.data.image
       console.log('response.data:', response.data.results)
       results.value = response.data.results.map(item => ({
@@ -127,25 +134,45 @@ const deleteRow = (index) => {
 
 const handleSubmit = async () => {
   let data = null;
-  let submitData =  new FormData();
+  const submitData = [];
   results.value.forEach((result) => {
-    submitData.append('REF_EXNAME', result.name)
-    submitData.append('REF_QUAN', result.quantity)
-    submitData.append('REF_END_DATE', result.endDate)
-    submitData.append('REF_PHOTO', imageSrc.value)
-    submitData.append('MEM_EMAIL', sessionStorage.getItem('memEmail'))
-    console.log('sessionStorage.getItem(memEmail):', sessionStorage.getItem('memEmail'))
-  })
-  console.log('submitData:', [...submitData.entries()].length)
+    let data = {
+      'refName': result.name,
+      'refQuan': result.quantity,
+      'refEndDate': result.endDate,
+      'refPhoto': image.value,
+      'memEmail': sessionStorage.getItem('memEmail')
+    };
+    console.log('sessionStorage.getItem(memEmail):', sessionStorage.getItem('memEmail'));
+    submitData.push(data);
+  });
+  console.log('submitData:', submitData.length)
 
-  try {
-    data = await axios.post('/ref/insert', submitData);
-    console.log(data.data);
-
-  } catch (error) {
-    console.error(error);
-  }
+    await axios.post('/ref/insert', submitData, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((response) => {
+      axiosMessage.value = '저장이 성공했습니다.';
+      console.log('response.data:', response.data)
+    })
+    .catch((error) => {
+      console.error(error);
+      axiosMessage.value = '저장에 실패했습니다.';
+    })
+    .finally(() => {
+      axiosdialog.value = true;
+    });
 };
+
+const closeDialog = () => {
+    axiosdialog.value = false;
+    router.push({
+    name : "/",
+    });
+};
+
 
 </script>
 
@@ -334,7 +361,7 @@ const handleSubmit = async () => {
               <VCol cols="12" md="2" />
 
               <VCol cols="12" md="8">
-                              <VTable
+                <VTable
                   height="250"
                   fixed-header
                 >
@@ -408,4 +435,17 @@ const handleSubmit = async () => {
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-dialog v-model="axiosdialog" max-width="400">
+    <v-card>
+      <v-card-title class="headline">{{ axiosMessage }}</v-card-title>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="green darken-1" text @click="closeDialog">확인</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+
+
 </template>
