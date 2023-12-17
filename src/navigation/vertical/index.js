@@ -1,10 +1,11 @@
-import admin from './admin'
+
 import jinwoo from './jinwoo'
 import recipe from './recipe'
 import ref from './ref'
 import calorie from './calorie'
+import admin from './admin'
 
-export default [
+const baseRoutes = [
   {
     title: 'Home',
     to: { name: 'index' },
@@ -15,12 +16,22 @@ export default [
     to: { name: 'PageBmi' },
     icon: { icon: 'mdi-calculator-variant-outline' },
   },
+  {
+    title: '공지사항',
+    to: 'notice-noticeList',
+    icon: { icon: 'mdi-bulletin-board' },
+  },
   ...jinwoo,
   ...ref,
   ...recipe,
-  ...admin,
   ...calorie,
 
 ]
+
+if(sessionStorage.getItem('loginType') === 'ADMIN'){
+  baseRoutes.push(...admin)
+}
+
+export default baseRoutes 
 
 

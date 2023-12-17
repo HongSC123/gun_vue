@@ -6,8 +6,8 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import FullCalendar from '@fullcalendar/vue3'
 import axios from 'axios'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useRtl } from 'vuetify'
+// import calorie from '@/router/calorie'
 
 // 현재 이벤트 목록을 저장할 리액티브 변수
 const currentEvents = ref([])
@@ -33,8 +33,60 @@ const { isRtl } = useRtl()
 //   }
 // }
 
-const router = useRouter();
 const selectionDate = ref('');
+
+let totalNutrition = ref([]);
+const isModalOpen = ref(false);
+let results = ref([]);
+
+// 함수 정의
+const openModal = async (selection_date, selection_date1) => {
+  try {
+    const mem_email = sessionStorage.getItem("memEmail");
+    selectionDate.value = selection_date1;
+    
+    const response = await axios.get(`/caloriedetail/${mem_email}/${selection_date}`);
+    const array = response.data;
+    console.log("서버 응답:", response.data);
+
+    totalNutrition = array.reduce((accumulator, currentItem) => {
+      // 누산기에 더하고자 하는 각각의 영양소 더하기
+      accumulator.ingest_calorie = (accumulator.ingest_calorie || 0) + currentItem.ingest_calorie;
+      accumulator.weight = (accumulator.weight || 0) + currentItem.weight;
+      accumulator.kcal = (accumulator.kcal || 0) + currentItem.kcal;
+      accumulator.carbohydrate = (accumulator.carbohydrate || 0) + currentItem.carbohydrate;
+      accumulator.sugar = (accumulator.sugar || 0) + currentItem.sugar;
+      accumulator.fat = (accumulator.fat || 0) + currentItem.fat;
+      accumulator.protein = (accumulator.protein || 0) + currentItem.protein;
+      accumulator.calcium = (accumulator.calcium || 0) + currentItem.calcium;
+      accumulator.phosphorus = (accumulator.phosphorus || 0) + currentItem.phosphorus;
+      accumulator.sodium = (accumulator.sodium || 0) + currentItem.sodium;
+      accumulator.potassium = (accumulator.potassium || 0) + currentItem.potassium;
+      accumulator.magnesium = (accumulator.magnesium || 0) + currentItem.magnesium;
+      accumulator.iron = (accumulator.iron || 0) + currentItem.iron;
+      accumulator.zinc = (accumulator.zinc || 0) + currentItem.zinc;
+      accumulator.cholesterol = (accumulator.cholesterol || 0) + currentItem.cholesterol;
+      accumulator.trans_fat = (accumulator.trans_fat || 0) + currentItem.trans_fat;
+      // 필요한 다른 영양소도 위와 같이 더할 수 있음
+      return accumulator;
+    }, {});
+
+    console.log("총 영양소:", totalNutrition);
+    console.log("칼슘",totalNutrition.calcium);
+    console.log("타입",typeof(totalNutrition.calcium))
+
+
+    isModalOpen.value = true; // isModalOpen이 반응형 변수인 것으로 가정합니다.
+
+  } catch (error) {
+    console.error("서버에서 데이터를 가져오는 중 오류 발생:", error);
+    // 오류를 처리합니다. 예를 들어 사용자에게 오류 메시지를 표시할 수 있습니다.
+  }
+};
+
+const closeModal = () => {
+  isModalOpen.value = false;
+};
 
 // 달력에서 이벤트를 클릭했을 때 호출되는 핸들러 함수
 const handleEventClick = clickInfo => {
@@ -53,38 +105,13 @@ const month = FormattedDate.split('/')[0];
 const day = FormattedDate.split('/')[1];
 const year = FormattedDate.split('/')[2];
 
-const clickFormattedDate = `${year}-${month}-${day}`
+const selection_date = `${year}-${month}-${day}`
 
-  console.log("포맷한 날짜 : " + clickFormattedDate);
-  this.$router.push({
-    name : "/calorieDetail", 
-    query: { "data" : clickFormattedDate }
-  })
+  console.log("포맷한 날짜 : " + selection_date);
 
-}
+const selection_date1 = `${year}년 ${month}월 ${day}일`
 
-const fetchDataFromServer = async selection_date => {
-  try {
-    // 서버에서 데이터를 조회하고 필요한 처리를 수행
-    const mem_email = sessionStorage.getItem("memEmail");
-    const response = await axios.get(`/caloriedetail/${mem_email}/${selection_date}`);
-    
-    // 조회된 데이터를 콘솔에 출력
-    console.log('%c서버에서 조회한 데이터:', 'color: green; font-weight: bold', response.data);
- 
-    // router.push({ 
-    //   name : "calorieDetail", 
-    //   query: { "data" : response.data }
-    // });
-    // 조회된 데이터와 함께 페이지 이동
-    // router.push({ 
-    //   name: 'calenderDetail', 
-    //   params: { mem_email, selectionDate: selection_date },
-    //   query: { data: response.data } // 데이터를 쿼리로 전달
-    // });
-  } catch (error) {
-    console.error('%c서버와 통신 중 오류 발생:', 'color: red; font-weight: bold', error);
-  }
+  openModal(selection_date, selection_date1);
 }
 
 // 달력의 이벤트가 변경될 때 호출되는 핸들러 함수
@@ -223,24 +250,109 @@ const breadcrumbs = [
 
 <template>
   <console class="log"></console>
-  <VRow>
-    <!-- Breadcrumbs -->
-    <VCol cols="12">
-      <VBreadcrumbs
-        :items="breadcrumbs"
-        divider="-"
-        class="px-0"
-      />
-    </VCol>
+  
+    <VRow class="calendar-container">
+      <!-- Breadcrumbs -->
+      <VCol cols="12">
+        <VBreadcrumbs
+          :items="breadcrumbs"
+          divider="-"
+          class="px-0"
+        />
+      </VCol>
 
-    <!-- FullCalendar를 포함한 카드 -->
-    <VCol cols="12">
-      <VCard>
-        <FullCalendar :options="calendarOptions" />
-      </VCard>
-    </VCol>
-  </VRow>
+      <!-- FullCalendar를 포함한 카드 -->
+      <VCol cols="12">
+        <VCard>
+          <FullCalendar :options="calendarOptions" />
+        </VCard>
+      </VCol>
+    </VRow>
+  
+
+  <v-dialog v-model="isModalOpen" max-width="1000">
+    
+
+    <v-card>
+      <v-card-title class="headline">
+        <div align="center" :style="{ fontSize: 'xx-large' }">{{ selectionDate }} 종합 영양 성분</div>
+      </v-card-title>
+      <v-card-text>
+      <div class="nutrition-facts-form white-box">
+        <VTable height="250">
+          <thead>
+            <tr>
+              <th class="text-uppercase" style="font-size: 20px; font-weight: bold;">
+                영양성분
+              </th>
+              <th class="text-uppercase" style="justify-content: space-between;">
+                <div style="font-size: 20px; font-weight: bold;">총합</div> <div style="text-align: right;">{{ totalNutrition.ingest_calorie }}kcal</div>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+              <tr>
+                <td>중량</td><td>{{ totalNutrition.weight.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>열량</td><td>{{ totalNutrition.kcal.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>탄수화물</td><td>{{ totalNutrition.carbohydrate.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>당류</td><td>{{ totalNutrition.sugar.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>지방</td><td>{{ totalNutrition.fat.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>단백질</td><td>{{ totalNutrition.protein.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>칼슘</td><td>{{ totalNutrition.calcium.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>인</td><td>{{ totalNutrition.phosphorus.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>나트륨</td><td>{{ totalNutrition.sodium.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>칼륨</td><td>{{ totalNutrition.potassium.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>마그네슘</td><td>{{ totalNutrition.magnesium.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>철</td><td>{{ totalNutrition.iron.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>아연</td><td>{{ totalNutrition.zinc.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>콜레스테롤</td><td>{{ totalNutrition.cholesterol.toFixed(2) }}</td>
+              </tr>
+              <tr>
+                <td>트랜스지방</td><td>{{ totalNutrition.trans_fat.toFixed(2) }}</td>
+              </tr>
+          </tbody>
+        </VTable>
+      </div>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="green darken-1" @click="closeModal" class="ml-auto">확인</v-btn>
+        <!-- <v-spacer></v-spacer> -->
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
-<style lang="scss">
+
+
+<style scoped>
+.calendar-container {
+  padding-bottom: 50px !important; /* 원하는 패딩 값으로 조절 */
+}
 </style>

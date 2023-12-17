@@ -12,13 +12,13 @@ const loginType = sessionStorage.getItem('loginType')
 const accessToken = sessionStorage.getItem('accessToken')
 const role = sessionStorage.getItem('role')
 
-console.log(loginType)
-console.log(accessToken)
+// console.log(loginType)
+// console.log(accessToken)
 
 const showLogout = ref(!!accessToken)
 const showLogin = ref(!showLogout.value)
 
-console.log(showLogout.value, showLogin.value)
+// console.log(showLogout.value, showLogin.value)
 
 const logout = () => {
   const accessToken = sessionStorage.getItem('accessToken')
@@ -41,7 +41,6 @@ const logout = () => {
           },
         })
 
-
         // kakao.value.Auth.logout()
       } catch (error) {
         console.error('로그아웃 시도 중 오류 발생:', error)
@@ -57,7 +56,7 @@ const logout = () => {
       // 로그아웃 시에 실행할 코드
       axios.defaults.headers.common['Authorization'] = 'logout'
       
-      console.log(axios.defaults.headers.common['Authorization'])
+      //  console.log(axios.defaults.headers.common['Authorization'])
 
       // console.log("response", r)
       showLogout.value = false
@@ -79,9 +78,15 @@ const tokenCheck = () => {
     })
 }
 
+const adminList = () => {
+  router.push("/admin")
+}
+
+
 const userData = ref(null)
 
 onMounted(async () => {
+
   if (accessToken) {
     try {
       const response = await axios.get('/profile')
@@ -109,7 +114,7 @@ onMounted(async () => {
       variant="tonal"
     >
       <VImg
-        v-if="userData.memPhoto"
+        v-if="userData && userData.memPhoto"
         :src="'http://127.0.0.1:8080/'+userData.memPhoto"
       />
       <VImg
@@ -144,8 +149,8 @@ onMounted(async () => {
                     variant="tonal"
                   >
                     <img
-                      v-if="userData.memPhoto"
-                      :src="'http://127.0.0.1:8080/'+userData.memPhoto"
+                      v-if="userData && userData.memPhoto"
+                      :src="'http://127.0.0.1:8080/'+ userData.memPhoto"
                       
                       alt="프로필"
                       style="width: 24px; height: 24px;"
@@ -263,7 +268,20 @@ onMounted(async () => {
                 size="22"
               />
             </template>
-            <VListItemTitle>Token</VListItemTitle>
+            <VListItemTitle>토큰확인</VListItemTitle>
+          </VListItem>
+          <VListItem 
+            v-if="role === 'ADMIN'"
+            @click="adminList"
+          >
+            <template #prepend>
+              <VIcon
+                class="me-2"
+                icon="mdi-login"
+                size="22"
+              />
+            </template>
+            <VListItemTitle>회원관리</VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>

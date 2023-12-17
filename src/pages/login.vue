@@ -93,8 +93,6 @@ const kakaoLogin = () => {
           // console.log('사용자 이메일:', email)
 
           const kakaoInfo = {
-            accessToken: accessToken,
-            refreshToken: success.refresh_token,
             memEmail: email,
           }
 
@@ -246,12 +244,14 @@ const loginface = () => {
                   <VBtn
                     block
                     type="submit"
+                    style="margin-bottom: 10px;"
                   >
                     Login
                   </VBtn>
                   <VBtn
                     block
                     @click="loginface"
+                    style="margin-bottom: 10px;"
                   >
                     안면인식
                   </VBtn>

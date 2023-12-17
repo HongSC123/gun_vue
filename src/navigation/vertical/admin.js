@@ -1,11 +1,12 @@
 export default [
-  // { heading: '체형분석' },
+
+  { heading: '관리자 도구' },
   {
     title: '관리자',
-    icon: { icon: 'mdi-account-outline' },
+    icon: { icon: 'mdi-chart-donut' },
     children: [
-      { title: '회원 정보', to: 'admin-list' },
-          
+      { title: '회원 관리', to: 'admin-list' },
+      { title: '공지사항 작성', to: 'notice-noticeWrite' },
     ],
   },
 ]
