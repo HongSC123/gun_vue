@@ -2,6 +2,7 @@
 import axios from "@axios"
 import { ref, onMounted } from "vue"
 
+
 const partNames = {
   ear: "머리",
   shoulder: "어깨",
@@ -95,14 +96,17 @@ onMounted(()=>{
           {{ item.physicalNum }}        
         </td>
         <td>
-          {{ item.inputDate }}
+          {{ item.InputDate }}
         </td>
         <td>
-          {{ item.location }}
+          {{ item.Location }}
         </td>
         <!-- item.point가 객체인 경우, 객체 내의 속성을 표시 -->
-        <td v-if="item.point && typeof item.point === 'object' && Object.keys(item.point).length > 0">
-          {{ item.point.ear }}, {{ item.point.shoulder }}, {{ item.point.hip }}, {{ item.point.knee }}
+        <td v-if="item.Point && typeof item.Point === 'object' && Object.keys(item.Point).length > 0">
+          {{ formatMeasurement('ear', item.Point.ear) }} <br> 
+          {{ formatMeasurement('shoulder', item.Point.shoulder) }} <br>
+          {{ formatMeasurement('hip', item.Point.hip) }} <br>
+          {{ formatMeasurement('knee', item.Point.knee) }}
         </td>
         <!-- item.point가 빈 객체 또는 null/undefined인 경우 -->
         <td v-else>
@@ -112,20 +116,6 @@ onMounted(()=>{
     </tbody>
   </VTable>
 
-  <VBtn
-    block
-    color="info"
-    variant="tonal"
-    :to="{path: 'pagephysical'}"
-    class="mt-4" 
-    size="large"
-  >
-    체형정보 측정하기
-    <VIcon 
-      end
-      icon="mdi-camera-outline"
-    />
-  </VBtn>
 </template>
 
 <style scoped>
