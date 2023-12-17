@@ -62,6 +62,7 @@ export default defineConfig({
     outDir: "../gun/src/main/resources/static",
   },
   server: {
+    cors: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8888',
