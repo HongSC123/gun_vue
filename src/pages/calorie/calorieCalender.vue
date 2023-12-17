@@ -18,6 +18,15 @@ const { isRtl } = useRtl()
 //   const title = prompt('Please enter a new title for your event')
 //   const calendarApi = selectInfo.view.calendar
 
+const navigationTab = ref('ITEM ONE')
+const navigationTab2 = ref('ITEM ONE')
+
+let morning = '아침'
+let lunch = '점심'
+let dinner = '저녁'
+
+const tabContent = 'Pudding tiramisu caramels. Gingerbread gummies danish chocolate bar toffee marzipan. Wafer wafer cake powder danish oat cake.'
+
 //   // 날짜 선택 해제
 //   calendarApi.unselect()
 
@@ -271,88 +280,144 @@ const breadcrumbs = [
   
 
   <v-dialog v-model="isModalOpen" max-width="1000">
-    
+    <VRow style="flex-direction: column;">
+      <v-card style="width:1000px">
+        <v-card-title class="headline">
+          <div align="center" style="font-size: 30px; font-weight: bold; padding: 20px;">{{ selectionDate }} 종합 영양 성분</div>
+        </v-card-title>
+        <v-card-text>
+        <div class="nutrition-facts-form white-box">
+          <VTable height="300px">
+            <thead>
+              <tr>
+                <th class="text-uppercase" style="font-size: 20px; font-weight: bold;">
+                  영양성분
+                </th>
+                <th class="text-uppercase" style="justify-content: space-between;">
+                  <div style="font-size: 20px; font-weight: bold;">총합</div> 
+                </th>
+                <th style="width: 10px;">
+                  <div style="text-align: right; font-size: 15px;">{{ totalNutrition.ingest_calorie }}kcal</div>
+                </th>
+              </tr>
+            </thead>
 
-    <v-card>
-      <v-card-title class="headline">
-        <div align="center" :style="{ fontSize: 'xx-large' }">{{ selectionDate }} 종합 영양 성분</div>
-      </v-card-title>
-      <v-card-text>
-      <div class="nutrition-facts-form white-box">
-        <VTable height="250">
-          <thead>
-            <tr>
-              <th class="text-uppercase" style="font-size: 20px; font-weight: bold;">
-                영양성분
-              </th>
-              <th class="text-uppercase" style="justify-content: space-between;">
-                <div style="font-size: 20px; font-weight: bold;">총합</div> <div style="text-align: right;">{{ totalNutrition.ingest_calorie }}kcal</div>
-              </th>
-            </tr>
-          </thead>
+            <tbody>
+                <tr>
+                  <td>중량</td><td>{{ totalNutrition.weight.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>열량</td><td>{{ totalNutrition.kcal.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>탄수화물</td><td>{{ totalNutrition.carbohydrate.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>당류</td><td>{{ totalNutrition.sugar.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>지방</td><td>{{ totalNutrition.fat.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>단백질</td><td>{{ totalNutrition.protein.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>칼슘</td><td>{{ totalNutrition.calcium.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>인</td><td>{{ totalNutrition.phosphorus.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>나트륨</td><td>{{ totalNutrition.sodium.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>칼륨</td><td>{{ totalNutrition.potassium.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>마그네슘</td><td>{{ totalNutrition.magnesium.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>철</td><td>{{ totalNutrition.iron.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>아연</td><td>{{ totalNutrition.zinc.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>콜레스테롤</td><td>{{ totalNutrition.cholesterol.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>트랜스지방</td><td>{{ totalNutrition.trans_fat.toFixed(2) }}</td>
+                </tr>
+            </tbody>
+          </VTable>
+        </div>
+        </v-card-text>
+      </v-card>
+      
+      <VCol md="15" cols="50">
+        <VCard style="width:1000px; height:400px;">
+          <VTabs v-model="navigationTab">
+            <VTab>
+              {{ morning }}
+            </VTab>
+            <VTab>
+              {{ lunch }}
+            </VTab>
+            <VTab>
+              {{ dinner }}
+            </VTab>
+          </VTabs>
 
-          <tbody>
-              <tr>
-                <td>중량</td><td>{{ totalNutrition.weight.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>열량</td><td>{{ totalNutrition.kcal.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>탄수화물</td><td>{{ totalNutrition.carbohydrate.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>당류</td><td>{{ totalNutrition.sugar.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>지방</td><td>{{ totalNutrition.fat.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>단백질</td><td>{{ totalNutrition.protein.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>칼슘</td><td>{{ totalNutrition.calcium.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>인</td><td>{{ totalNutrition.phosphorus.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>나트륨</td><td>{{ totalNutrition.sodium.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>칼륨</td><td>{{ totalNutrition.potassium.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>마그네슘</td><td>{{ totalNutrition.magnesium.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>철</td><td>{{ totalNutrition.iron.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>아연</td><td>{{ totalNutrition.zinc.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>콜레스테롤</td><td>{{ totalNutrition.cholesterol.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>트랜스지방</td><td>{{ totalNutrition.trans_fat.toFixed(2) }}</td>
-              </tr>
-          </tbody>
-        </VTable>
-      </div>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn color="green darken-1" @click="closeModal" class="ml-auto">확인</v-btn>
-        <!-- <v-spacer></v-spacer> -->
-      </v-card-actions>
-    </v-card>
+          <!-- tabs content -->
+          <VWindow v-model="navigationTab" style="display: flex;">
+            <VWindowItem>
+              <VCard style="display: inline-block">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                    <VImg
+                      width="137"
+                      height="176"
+                      :src="eCommerce2"
+                    />
+                  </div>
+
+                  <VImg :src="pages6" />
+
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>Apple iPhone 11 Pro</VCardTitle>
+                    </VCardItem>
+
+                    <VCardText>
+                      <p class="mb-2">
+                        Apple iPhone 11 Pro smartphone.  <br>
+                        Announced Sep 2019. Features 5.8″ <br>
+                        display Apple A13 Bionic
+                      </p>
+
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">Price :</span>
+                        <span class="font-weight-medium">$899</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+
+              <VCardText>
+                <VBtn @click="closeModal">Learn More</VBtn>
+              </VCardText>
+            </VWindowItem>
+            
+            
+          </VWindow>
+        </VCard>
+      </VCol>
+    </VRow>
   </v-dialog>
 </template>
 
 
 
 <style scoped>
-.calendar-container {
-  padding-bottom: 50px !important; /* 원하는 패딩 값으로 조절 */
-}
 </style>
