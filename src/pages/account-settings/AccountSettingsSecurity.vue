@@ -1,9 +1,8 @@
 <script setup>
-import poseFs9 from '@images/pages/pose-fs-9.png'
-import { VDataTable } from 'vuetify/labs/VDataTable'
 import { useRouter } from 'vue-router'
 import axios from '@axios'
-import ScrollToTop from '@core/components/ScrollToTop.vue'
+import { ref, onMounted } from 'vue'
+
 
 const router = useRouter()
 const isCurrentPasswordVisible = ref(false)
@@ -12,6 +11,9 @@ const isConfirmPasswordVisible = ref(false)
 const currentPassword = ref('')
 const newPassword = ref('')
 const confirmPassword = ref('')
+const accessToken = sessionStorage.getItem('accessToken')
+
+const userData = ref(null)
 
 const passwordRequirements = [
   'Minimum 8 characters long - the more, the better',
@@ -42,6 +44,51 @@ const passwordCheck = () => {
       console.log(e)
     })
 }
+
+const email = ref('')
+const checkCode = ref('')
+const code = ref('')
+const codeInput = ref(null)
+
+// 이메일 전송 함수
+async function sendEmail() {
+  try {
+    const response = await axios.post(`/email/${email.value}`)
+    
+    checkCode.value = response.data
+  
+
+    // 서버로부터 받은 인증 코드를 처리하는 로직을 추가하세요
+  } catch (error) {
+    // 요청 실패 시 에러 처리 로직을 추가하세요
+  }
+}
+function verifyCode() {
+  if (checkCode.value === code.value) {
+    
+    axios.patch("/emailok")
+    console.log('인증 성공')
+
+    // 컨트롤러에 접근하는 로직을 추가하세요
+  } else {
+    // 인증 실패 시 처리할 로직을 추가하세요
+    console.log('인증 실패')
+  }
+}
+onMounted(async () => {
+  codeInput.value = ref.codeInput
+  if (accessToken) {
+    try {
+      const response = await axios.get('/profile')
+
+      userData.value = response.data
+      console.log(userData.value.memAct)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+})
 </script>
 
 <template>
@@ -141,30 +188,44 @@ const passwordCheck = () => {
         </VForm>
       </VCard>
     </VCol>
-    <!-- !SECTION -->
-
-    <!-- SECTION Two-steps verification -->
-    <VCol cols="12">
-      <VCard title="Two-steps verification">
-        <VCardText class="text-base">
-          <p>
-            Two factor authentication is not enabled yet.
-          </p>
-          <p class="mb-6">
-            Two-factor
-          </p>
-
-          <VBtn @click="isOneTimePasswordDialogVisible = true">
-            Enable 2FA
-          </VBtn>
-        </VCardText>
-      </VCard>
+  </VRow>
+  <VRow>
+    <VCol
+      cols="12"
+      md="6"
+    >
+      <VTextField
+        v-model="email"
+        label="Email"
+      />
     </VCol>
-    <!-- !SECTION -->
-    
-    <!-- SECTION Enable One time password -->
-    <TwoFactorAuthDialog v-model:isDialogVisible="isOneTimePasswordDialogVisible" />
-    <!-- !SECTION -->
-  </vrow>
-  <ScrollToTop />
+    <VCol
+      cols="12"
+      md="6"
+    >
+      <VBtn @click="sendEmail">
+        Email 인증
+      </VBtn>
+    </VCol>
+  </VRow>
+  <VRow>
+    <VCol
+      cols="12"
+      md="6"
+    >
+      <VTextField
+        ref="codeInput"
+        v-model="code"
+        label="Code"
+      />
+    </VCol>
+    <VCol
+      cols="12"
+      md="6"
+    >
+      <VBtn @click="verifyCode">
+        인증 확인
+      </VBtn>
+    </VCol>
+  </VRow>
 </template>

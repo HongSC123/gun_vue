@@ -1,8 +1,8 @@
 import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
 
-import ChatFixed from '@/pages/recipe/ChatFixed.vue'
-import ChatRecent from '@/pages/recipe/ChatRecent.vue'
+import ChatFixed from '@/pages/recipe/chatFixed.vue'
+import ChatRecent from '@/pages/recipe/chatRecent.vue'
 import calorieDetail from '@/pages/calorie/calenderDetail.vue'
 import routes from '~pages'
 import admin from './admin'
@@ -30,8 +30,10 @@ const additionalRoutes = [
   },
 ]
 
+// createWebHistory(import.meta.env.BASE_URL),
+
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     ...setupLayouts(routes),
     ...sun,

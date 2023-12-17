@@ -12,6 +12,7 @@ import { themeConfig } from '@themeConfig'
 import { useRouter } from 'vue-router'
 import { useKakao } from 'vue3-kakao-sdk'
 import axios from 'e:/gun_workspace/gun_vue/node_modules/axios/index'
+import FaceLogin from './member/FaceLogin.vue'
 
 const { kakao } = useKakao()
 
@@ -135,22 +136,44 @@ const performKakaoLogin = kakaoInfo => {
     })
 }
 
+const naverLogin = () =>{
+  console.log("naver")
+  axios.get('/loginnaver')
+    .then(r => {
+      showSocialLoginPopup(r.data)
+      router.push("/login/naver")
+      console.log(r)
+    }).catch(e => {
+      console.log(e)
+    })
+
+}
+
+const showSocialLoginPopup = url => {
+
+  // 팝업 창을 생성하고 URL을 로드하는 로직을 작성합니다.
+  // 예시로 window.open() 함수를 사용하여 팝업 창을 열어 URL을 로드합니다.
+
+  window.open(url, 'socialLoginPopup', 'width=600, height=400')
+
+
+}
+
+const dialogVisible = ref(false)
+
 const loginface = () => {
-  console.log("face")
-
-  router.push("/faceLogin")
-
-  // axios.post("/login/face")
-  //   .then(r => {
-  //     console.log(r)
-  //   })
-  //   .catch(e => {
-  //     console.log(e)
-  //   })
+  dialogVisible.value = true
 }
 </script>
 
 <template>
+  <VDialog
+    v-model="dialogVisible"
+    max-width="500"
+    :overlay-opacity="0.8"
+  >
+    <FaceLogin />
+  </VDialog>
   <div>
     <!-- Title and Logo -->
     <div class="auth-logo d-flex align-start gap-x-3">
@@ -288,7 +311,16 @@ const loginface = () => {
                   <img
                     src="@images/loginImages/kakao_login_small.png"
                     alt="카카오로그인"
+                    width="100"
+                    height="50"
                     @click="kakaoLogin"
+                  >
+                  <img
+                    src="@images/loginImages/naver_login.png"
+                    alt="네이버로그인"
+                    width="100"
+                    height="50"
+                    @click="naverLogin"
                   >
                 </VCol>
               </VRow>
