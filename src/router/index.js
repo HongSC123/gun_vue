@@ -28,6 +28,16 @@ const additionalRoutes = [
     name: 'calorieDetail',
     component: calorieDetail,
   },
+  {
+    path: '/refList',
+    name: 'refList',
+    component: () => import('@/pages/ref/refList.vue'),
+  },
+  {
+    path: '/refinsert',
+    name: 'refInsert',
+    component: () => import('@/pages/ref/refInsert.vue'),
+  },
 ]
 
 // createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +53,7 @@ const router = createRouter({
     ...ref,
     ...notice,
   ],
+  ...ref,
   ...jinwoo,
 })
 

@@ -59,7 +59,7 @@ const detectPhoto = async () => {
     console.log('formData:', formData)
 
     try {
-      const response = await axios.post('http://43.200.244.34:8000/detectFruits', formData, {
+      const response = await axios.post('http://192.168.0.131:8000/detect/fruits', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -112,7 +112,6 @@ const validatePersonalForm = () => {
       }
     };
 
-const endDate = ref(end_date());
 
 function end_date() {
   const today = new Date();
@@ -168,13 +167,12 @@ const handleSubmit = async () => {
 
 const closeDialog = () => {
     axiosdialog.value = false;
-    router.push({
-    name : "/",
-    });
+    router.push({path: '/ref/refList'})
 };
 
 
 </script>
+
 
 <template>
   <VCard>
@@ -445,7 +443,8 @@ const closeDialog = () => {
       </v-card-actions>
     </v-card>
   </v-dialog>
-
-
-
 </template>
+
+
+
+
