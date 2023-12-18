@@ -3,12 +3,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import ChatFixed from '@/pages/recipe/chatFixed.vue'
 import ChatRecent from '@/pages/recipe/chatRecent.vue'
+import refInsert from '@/pages/ref/refInsert.vue'
+import refList from '@/pages/ref/refList.vue'
+
 import routes from '~pages'
 import admin from './admin'
 import jinwoo from './jinwoo'
 import sun from './sun'
 import calorie from './calorie'
-import ref from './ref'
 import notice from './notice'
 
 const additionalRoutes = [
@@ -23,14 +25,20 @@ const additionalRoutes = [
     component: ChatFixed,
   },
   {
-    path: '/refList',
+    path: '/ref/refList',
     name: 'refList',
-    component: () => import('@/pages/ref/refList.vue'),
+    component: refList,
+    meta : {
+      Layout : setupLayouts
+    },
   },
   {
-    path: '/refinsert',
+    path: '/ref/refinsert',
     name: 'refInsert',
-    component: () => import('@/pages/ref/refInsert.vue'),
+    component: refInsert,
+    meta : {
+      Layout : setupLayouts
+    },
   },
 ]
 
@@ -44,10 +52,8 @@ const router = createRouter({
     ...additionalRoutes,
     ...admin,
     ...calorie,
-    ...ref,
     ...notice,
   ],
-  ...ref,
   ...jinwoo,
 })
 
