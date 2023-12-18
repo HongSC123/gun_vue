@@ -7,7 +7,7 @@ import AccoutSettings from '@/pages/member/AccountSettingsAccount.vue'
 import FaceLogin from '@/pages/member/FaceLogin.vue'
 import KakaoLogin from '@/pages/member/kakaologin.vue'
 import NaverTemp from '@/pages/naverTemp.vue'
-import defaults from '@/plugins/vuetify/defaults'
+
 
 const sun = [{
   path: '/register/account',
@@ -38,6 +38,9 @@ const sun = [{
   path: '/adminLogin',
   name: 'AdminLogin',
   component: AdminLogin,
+  mate: {
+    layout: 'blank',
+  },
 },
 {
   path: '/adminRegister',
@@ -54,7 +57,7 @@ const sun = [{
   name: 'NaverLogin',
   component: NaverTemp,
   mate: {
-    layout: defaults,
+    layout: 'blank',
   },
 
 }]

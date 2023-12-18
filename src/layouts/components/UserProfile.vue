@@ -79,7 +79,7 @@ const tokenCheck = () => {
 }
 
 const adminList = () => {
-  router.push("/admin")
+  router.push("/login/naver")
 }
 
 
@@ -254,34 +254,6 @@ onMounted(async () => {
               />
             </template>
             <VListItemTitle>Login</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 token check -->
-          <VListItem 
-            v-if="role === 'ADMIN'"
-            @click="tokenCheck"
-          >
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="mdi-login"
-                size="22"
-              />
-            </template>
-            <VListItemTitle>토큰확인</VListItemTitle>
-          </VListItem>
-          <VListItem 
-            v-if="role === 'ADMIN'"
-            @click="adminList"
-          >
-            <template #prepend>
-              <VIcon
-                class="me-2"
-                icon="mdi-login"
-                size="22"
-              />
-            </template>
-            <VListItemTitle>회원관리</VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>

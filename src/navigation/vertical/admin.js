@@ -6,7 +6,6 @@ export default [
     icon: { icon: 'mdi-chart-donut' },
     children: [
       { title: '회원 관리', to: 'admin-list' },
-      { title: '공지사항 작성', to: 'notice-noticeWrite' },
     ],
   },
 ]

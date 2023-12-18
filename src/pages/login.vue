@@ -59,6 +59,16 @@ const loginCheck = () => {
       
       return
     }
+    if(r.data.error === '804'){
+      alert("탈퇴 회원입니다.")
+      
+      return
+    }
+    if(r.data.error === '805'){
+      alert("차단된 회원입니다.")
+      
+      return
+    }
 
     router.push("/")
     
@@ -141,7 +151,6 @@ const naverLogin = () =>{
   axios.get('/loginnaver')
     .then(r => {
       showSocialLoginPopup(r.data)
-      
       console.log(r)
     }).catch(e => {
       console.log(e)

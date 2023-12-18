@@ -67,22 +67,63 @@ onMounted(() => {
       memQuit: item.memQuit,
       memAct: item.memAct,
     }))
-
-    console.log("productList", data.value)
   })
 })
 
-const updateAct = memEmail =>{
+const updateAct = event =>{
+  const row = event.target.closest('tr')
+  const memEmail = row.querySelector('.v-data-table__td.v-data-table-column--align-start').innerText
+
+  console.log(memEmail)
+
   axios.put(`/admin/update/${memEmail}`).then(res => {
+    alert(memEmail + "회원이 차단되었습니다.")
   })
+  setTimeout(() => {
+    axios.get('/admin/list').then(res => {
+    // 배열로 변환
+      console.log(res.data)
+      console.log(typeof res.data)
+
+      // 데이터 가공
+      data.value = res.data.map(item => ({
+        memEmail: item.memEmail,
+        memType: item.memType,
+        memEn: item.memEn,
+        memMod: item.memMod,
+        memQuit: item.memQuit,
+        memAct: item.memAct,
+      }))
+
+      console.log("productList", data.value)
+    })
+  }, 100)
 }
 </script>
 
 <template>
+  <VRow>
+    <VCol
+      cols="12"
+      offset-md="8"
+      md="4"
+    >
+      <VTextField
+        v-model="search"
+        dense
+        outlined
+        label="검색"
+        append-inner-icon="mdi-magnify"
+        single-line
+        hide-details
+      />
+    </VCol>
+  </VRow>
   <VDataTable
     :headers="headers"
     :items="data"
     :search="search"
     :items-per-page="5"
+    @click:row="updateAct"
   />
 </template>
