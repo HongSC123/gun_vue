@@ -3,9 +3,12 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import ChatFixed from '@/pages/recipe/chatFixed.vue'
 import ChatRecent from '@/pages/recipe/chatRecent.vue'
+<<<<<<< HEAD
 import calorieDetail from '@/pages/calorie/calenderDetail.vue'
 import refInsert from '@/pages/ref/refInsert.vue'
 import refList from '@/pages/ref/refList.vue'
+=======
+>>>>>>> 25975b2b328da166283b219c44b3bab448cdc8db
 import routes from '~pages'
 import admin from './admin'
 import jinwoo from './jinwoo'
@@ -25,12 +28,16 @@ const additionalRoutes = [
     component: ChatFixed,
   },
   {
+<<<<<<< HEAD
     path: '/calorie/calenderdetail',
     name: 'calorieDetail',
     component: calorieDetail,
   },
   {
     path: '/ref/refList',
+=======
+    path: '/refList',
+>>>>>>> 25975b2b328da166283b219c44b3bab448cdc8db
     name: 'refList',
     component: refList,
     meta : {

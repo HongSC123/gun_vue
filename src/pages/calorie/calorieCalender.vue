@@ -47,6 +47,7 @@ const selectionDate = ref('');
 let totalNutrition = ref([]);
 const isModalOpen = ref(false);
 let results = ref([]);
+let serverData = ref([]);
 
 // 함수 정의
 const openModal = async (selection_date, selection_date1) => {
@@ -55,9 +56,9 @@ const openModal = async (selection_date, selection_date1) => {
     selectionDate.value = selection_date1;
     
     const response = await axios.get(`/caloriedetail/${mem_email}/${selection_date}`);
-    const array = response.data;
+    let array = response.data;
     console.log("서버 응답:", response.data);
-
+    console.log("변수에 담기:", serverData);
     totalNutrition = array.reduce((accumulator, currentItem) => {
       // 누산기에 더하고자 하는 각각의 영양소 더하기
       accumulator.ingest_calorie = (accumulator.ingest_calorie || 0) + currentItem.ingest_calorie;
@@ -84,7 +85,8 @@ const openModal = async (selection_date, selection_date1) => {
     console.log("칼슘",totalNutrition.calcium);
     console.log("타입",typeof(totalNutrition.calcium))
 
-
+    serverData = response.data;
+    
     isModalOpen.value = true; // isModalOpen이 반응형 변수인 것으로 가정합니다.
 
   } catch (error) {
@@ -370,46 +372,149 @@ const breadcrumbs = [
 
           <!-- tabs content -->
           <VWindow v-model="navigationTab" style="display: flex;">
-            <VWindowItem>
-              <VCard style="display: inline-block">
+            <VWindowItem style="overflow-y: auto; max-height: 300px; width: 980px;">
+              <VCard v-if="navigationTab === 0" class="my-card">
                 <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
                   <div class="ma-auto pa-5">
-                    <VImg
-                      width="137"
-                      height="176"
-                      :src="eCommerce2"
-                    />
                   </div>
-
-                  <VImg :src="pages6" />
-
                   <div>
                     <VCardItem>
-                      <VCardTitle>Apple iPhone 11 Pro</VCardTitle>
+                      <VCardTitle>돈가스</VCardTitle>
                     </VCardItem>
-
                     <VCardText>
                       <p class="mb-2">
-                        Apple iPhone 11 Pro smartphone.  <br>
-                        Announced Sep 2019. Features 5.8″ <br>
-                        display Apple A13 Bionic
+                        3대 영양소 <br>
+                        탄수화물 :  58.9<br>
+                        단백질   :  8.7<br>
+                        지방     :  3<br>
+                        총량     :  300.7 kcal<br>
                       </p>
-
                       <h6 class="text-base font-weight-medium">
-                        <span class="font-weight-regular">Price :</span>
-                        <span class="font-weight-medium">$899</span>
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 12시 06분</span>
                       </h6>
                     </VCardText>
                   </div>
                 </div>
               </VCard>
-
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>양념게장</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  46.3<br>
+                        단백질   :  20.4<br>
+                        지방     :  2<br>
+                        총량     :  275.6 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 02시 10분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>훈제연어</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  9.3<br>
+                        단백질   :  19.3<br>
+                        지방     :  6.2<br>
+                        총량     :  169 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 04시 22분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>닭죽</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  92.5<br>
+                        단백질   :  75.9<br>
+                        지방     :  48.2<br>
+                        총량     :  1181.7 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 09시 39분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>소고기무국</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  8.1<br>
+                        단백질   :  13.5<br>
+                        지방     :  4.7<br>
+                        총량     :  125.2 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 09시 42분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              
+              <!-- <template v-if="navigationTab === 0">
+                <VCard>
+                  {{ serverData.filter(item => item.mealType === 'morning')[0].ingest_calorie }}
+                </VCard>
+              </template>
+              
+              <template v-else-if="navigationTab === 1">
+                <VCard>
+                  {{ array }}
+                </VCard>
+              </template>
+              
+              <template v-else-if="navigationTab === 2">
+                <VCard>
+                  {{ array }}
+                </VCard>
+              </template> -->
               <VCardText>
                 <VBtn @click="closeModal">Learn More</VBtn>
               </VCardText>
             </VWindowItem>
-            
-            
           </VWindow>
         </VCard>
       </VCol>
@@ -420,4 +525,9 @@ const breadcrumbs = [
 
 
 <style scoped>
+.my-card {
+  display: inline-block;
+  margin: 20px; /* 원하는 간격으로 조절하세요 */
+}
 </style>
+ 
