@@ -141,7 +141,7 @@ const naverLogin = () =>{
   axios.get('/loginnaver')
     .then(r => {
       showSocialLoginPopup(r.data)
-      router.push("/login/naver")
+      
       console.log(r)
     }).catch(e => {
       console.log(e)
