@@ -3,6 +3,7 @@ import axios from '@axios';
 import { ref } from 'vue';
 import { VForm } from 'vuetify/components/VForm';
 import { useRouter } from 'vue-router'
+import RefList from './refList.vue';
 
 
 axios.defaults.timeout = 0
@@ -167,8 +168,10 @@ const handleSubmit = async () => {
 
 const closeDialog = () => {
     axiosdialog.value = false;
-    router.push({path: '/ref/refList'})
+    // router.push({name: 'refList'})
+    window.location.href = 'http://localhost:8888/';
 };
+
 
 
 </script>

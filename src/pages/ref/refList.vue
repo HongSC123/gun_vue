@@ -10,7 +10,6 @@ const axiosdialog = ref(false)
 const axiosMessage = ref('')
 const detailDialog = ref(false)
 const editDialog = ref(false)
-const menu = ref(false)
 const editItem = ref({
   ref_NUM: null,
   refEndDate: null,
