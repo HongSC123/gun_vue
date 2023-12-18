@@ -13,7 +13,7 @@ const accessToken = sessionStorage.getItem('accessToken')
 const role = sessionStorage.getItem('role')
 
 // console.log(loginType)
-// console.log(accessToken)
+console.log(role)
 
 const showLogout = ref(!!accessToken)
 const showLogin = ref(!showLogout.value)
