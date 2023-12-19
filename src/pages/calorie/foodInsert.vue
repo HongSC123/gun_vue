@@ -3,7 +3,6 @@ import axios from '@axios';
 import { ref } from 'vue';
 import { VForm } from 'vuetify/components/VForm';
 import { useRouter } from 'vue-router'
-import RefList from './refList.vue';
 
 
 axios.defaults.timeout = 0
@@ -11,11 +10,11 @@ axios.defaults.timeout = 0
 const numberedSteps = [
   {
     title: '사진 촬영',
-    subtitle: '물품을 촬영해 주세요',
+    subtitle: '음식을 촬영해 주세요',
   },
   {
     title: '정보 등록',
-    subtitle: '정보 확인&유통기한 등록',
+    subtitle: '정보 확인',
   },
   {
     title: '최종 정보 확인',
@@ -28,9 +27,6 @@ const nameRules = [
 ]
 const quantityRules = [
   v => v > 0 || '수량은 1 이상이어야 합니다.',
-]
-const dateRules = [
-  v => new Date(v) >= new Date() || '유통기한은 오늘 날짜 이후여야 합니다.',
 ]
 
 const router = useRouter()
@@ -60,7 +56,7 @@ const detectPhoto = async () => {
     console.log('formData:', formData)
 
     try {
-      const response = await axios.post('http://192.168.0.131:8000/detect/fruits', formData, {
+      const response = await axios.post('http://192.168.0.131:8000/detect/food', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -71,7 +67,6 @@ const detectPhoto = async () => {
       console.log('response.data:', response.data.results)
       results.value = response.data.results.map(item => ({
         ...item,
-        endDate: end_date(),
       }))
       
     } catch (error) {
@@ -94,11 +89,9 @@ const validatePersonalForm = () => {
       const invalidMessages = results.value.reduce((messages, item) => {
         const nameMessage = nameRules[0](item.name)
         const quantityMessage = quantityRules[0](item.quantity)
-        const dateMessage = dateRules[0](item.endDate)
 
         if (nameMessage !== true) messages.push(nameMessage)
         if (quantityMessage !== true) messages.push(quantityMessage)
-        if (dateMessage !== true) messages.push(dateMessage)
 
         return messages
       }, [])
@@ -113,18 +106,10 @@ const validatePersonalForm = () => {
       }
     };
 
-
-function end_date() {
-  const today = new Date();
-  today.setDate(today.getDate() + 7);
-  return today.toISOString().substr(0, 10);
-}
-
 const addRow = () => {
   results.value.push({
     name: '',
     quantity: 0,
-    endDate: end_date(),
   });
 };
 
@@ -133,49 +118,46 @@ const deleteRow = (index) => {
 };
 
 const handleSubmit = async () => {
-  let data = null;
-  const submitData = [];
-  results.value.forEach((result) => {
-    let data = {
-      'refName': result.name,
-      'refQuan': result.quantity,
-      'refEndDate': result.endDate,
-      'refPhoto': image.value,
-      'memEmail': sessionStorage.getItem('memEmail')
-    };
-    console.log('sessionStorage.getItem(memEmail):', sessionStorage.getItem('memEmail'));
-    submitData.push(data);
-  });
-  console.log('submitData:', submitData.length)
+  if (results.value.length > 0) {
+    const result = results.value[0]; // 원하는 항목 선택
 
-    await axios.post('/ref/insert', submitData, {
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then((response) => {
+    let data = {
+      'foodName': result.name,
+      'foodQuan': result.quantity,
+      'foodPhoto': image.value,
+      'mem_email': sessionStorage.getItem('memEmail')
+    };
+
+    try {
+      const response = await axios.post('/calorieinsert', data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
       axiosMessage.value = '저장이 성공했습니다.';
-      console.log('response.data:', response.data)
-    })
-    .catch((error) => {
+      console.log('response.data:', response.data);
+    } catch (error) {
       console.error(error);
       axiosMessage.value = '저장에 실패했습니다.';
-    })
-    .finally(() => {
+    } finally {
       axiosdialog.value = true;
-    });
+    }
+  } else {
+    // 결과 배열이 비어 있는 경우 처리
+  }
 };
+
 
 const closeDialog = () => {
     axiosdialog.value = false;
-    // router.push({name: 'refList'})
-    window.location.href = 'http://localhost:8888/';
+    router.push({
+    name : "/",
+    });
 };
 
 
-
 </script>
-
 
 <template>
   <VCard>
@@ -264,7 +246,7 @@ const closeDialog = () => {
                   물품을 확인해 주세요
                 </h6>
                 <p class="text-xs mb-0">
-                  유통기한, 수량, 물품명을 확인해 주세요
+                  음식이름, 수량을 확인해 주세요
                 </p>
               </VCol>
 
@@ -281,13 +263,10 @@ const closeDialog = () => {
                 <thead>
                   <tr>
                     <th class="text-uppercase">
-                      이름
+                      음식이름
                     </th>
                     <th class="text-uppercase">
-                      수량
-                    </th>
-                    <th class="text-uppercase">
-                      유통기한
+                      음식 수
                     </th>
                     <th>
                     <p></p>
@@ -302,9 +281,6 @@ const closeDialog = () => {
                     </td>
                     <td>
                       <input type="number" v-model="item.quantity" :rules="quantityRules" class="form-control" placeholder="수량을 입력" style="width: 100px;">
-                    </td>
-                    <td>
-                      <input type="date" v-model="item.endDate" :rules="dateRules" class="form-control" placeholder="유통기한을 입력" style="width: 100px;">
                     </td>
                     <td>
                       <a href="#" @click="deleteRow(i)">삭제</a>
@@ -374,9 +350,6 @@ const closeDialog = () => {
                       <th class="text-uppercase">
                         수량
                       </th>
-                      <th class="text-uppercase">
-                        유통기한
-                      </th>
                     </tr>
                   </thead>
 
@@ -387,9 +360,6 @@ const closeDialog = () => {
                       </td>
                       <td>
                         {{ item.quantity }}
-                      </td>
-                      <td>
-                        {{ item.endDate }}
                       </td>
                     </tr>
                   </tbody>
@@ -446,8 +416,7 @@ const closeDialog = () => {
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+
+
 </template>
-
-
-
-

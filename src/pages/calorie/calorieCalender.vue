@@ -18,6 +18,15 @@ const { isRtl } = useRtl()
 //   const title = prompt('Please enter a new title for your event')
 //   const calendarApi = selectInfo.view.calendar
 
+const navigationTab = ref('ITEM ONE')
+const navigationTab2 = ref('ITEM ONE')
+
+let morning = '아침'
+let lunch = '점심'
+let dinner = '저녁'
+
+const tabContent = 'Pudding tiramisu caramels. Gingerbread gummies danish chocolate bar toffee marzipan. Wafer wafer cake powder danish oat cake.'
+
 //   // 날짜 선택 해제
 //   calendarApi.unselect()
 
@@ -38,6 +47,7 @@ const selectionDate = ref('');
 let totalNutrition = ref([]);
 const isModalOpen = ref(false);
 let results = ref([]);
+let serverData = ref([]);
 
 // 함수 정의
 const openModal = async (selection_date, selection_date1) => {
@@ -46,9 +56,9 @@ const openModal = async (selection_date, selection_date1) => {
     selectionDate.value = selection_date1;
     
     const response = await axios.get(`/caloriedetail/${mem_email}/${selection_date}`);
-    const array = response.data;
+    let array = response.data;
     console.log("서버 응답:", response.data);
-
+    console.log("변수에 담기:", serverData);
     totalNutrition = array.reduce((accumulator, currentItem) => {
       // 누산기에 더하고자 하는 각각의 영양소 더하기
       accumulator.ingest_calorie = (accumulator.ingest_calorie || 0) + currentItem.ingest_calorie;
@@ -75,7 +85,8 @@ const openModal = async (selection_date, selection_date1) => {
     console.log("칼슘",totalNutrition.calcium);
     console.log("타입",typeof(totalNutrition.calcium))
 
-
+    serverData = response.data;
+    
     isModalOpen.value = true; // isModalOpen이 반응형 변수인 것으로 가정합니다.
 
   } catch (error) {
@@ -271,88 +282,252 @@ const breadcrumbs = [
   
 
   <v-dialog v-model="isModalOpen" max-width="1000">
-    
+    <VRow style="flex-direction: column;">
+      <v-card style="width:1000px">
+        <v-card-title class="headline">
+          <div align="center" style="font-size: 30px; font-weight: bold; padding: 20px;">{{ selectionDate }} 종합 영양 성분</div>
+        </v-card-title>
+        <v-card-text>
+        <div class="nutrition-facts-form white-box">
+          <VTable height="300px">
+            <thead>
+              <tr>
+                <th class="text-uppercase" style="font-size: 20px; font-weight: bold;">
+                  영양성분
+                </th>
+                <th class="text-uppercase" style="justify-content: space-between;">
+                  <div style="font-size: 20px; font-weight: bold;">총합</div> 
+                </th>
+                <th style="width: 10px;">
+                  <div style="text-align: right; font-size: 15px;">{{ totalNutrition.ingest_calorie }}kcal</div>
+                </th>
+              </tr>
+            </thead>
 
-    <v-card>
-      <v-card-title class="headline">
-        <div align="center" :style="{ fontSize: 'xx-large' }">{{ selectionDate }} 종합 영양 성분</div>
-      </v-card-title>
-      <v-card-text>
-      <div class="nutrition-facts-form white-box">
-        <VTable height="250">
-          <thead>
-            <tr>
-              <th class="text-uppercase" style="font-size: 20px; font-weight: bold;">
-                영양성분
-              </th>
-              <th class="text-uppercase" style="justify-content: space-between;">
-                <div style="font-size: 20px; font-weight: bold;">총합</div> <div style="text-align: right;">{{ totalNutrition.ingest_calorie }}kcal</div>
-              </th>
-            </tr>
-          </thead>
+            <tbody>
+                <tr>
+                  <td>중량</td><td>{{ totalNutrition.weight.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>열량</td><td>{{ totalNutrition.kcal.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>탄수화물</td><td>{{ totalNutrition.carbohydrate.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>당류</td><td>{{ totalNutrition.sugar.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>지방</td><td>{{ totalNutrition.fat.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>단백질</td><td>{{ totalNutrition.protein.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>칼슘</td><td>{{ totalNutrition.calcium.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>인</td><td>{{ totalNutrition.phosphorus.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>나트륨</td><td>{{ totalNutrition.sodium.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>칼륨</td><td>{{ totalNutrition.potassium.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>마그네슘</td><td>{{ totalNutrition.magnesium.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>철</td><td>{{ totalNutrition.iron.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>아연</td><td>{{ totalNutrition.zinc.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>콜레스테롤</td><td>{{ totalNutrition.cholesterol.toFixed(2) }}</td>
+                </tr>
+                <tr>
+                  <td>트랜스지방</td><td>{{ totalNutrition.trans_fat.toFixed(2) }}</td>
+                </tr>
+            </tbody>
+          </VTable>
+        </div>
+        </v-card-text>
+      </v-card>
+      
+      <VCol md="15" cols="50">
+        <VCard style="width:1000px; height:400px;">
+          <VTabs v-model="navigationTab">
+            <VTab>
+              {{ morning }}
+            </VTab>
+            <VTab>
+              {{ lunch }}
+            </VTab>
+            <VTab>
+              {{ dinner }}
+            </VTab>
+          </VTabs>
 
-          <tbody>
-              <tr>
-                <td>중량</td><td>{{ totalNutrition.weight.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>열량</td><td>{{ totalNutrition.kcal.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>탄수화물</td><td>{{ totalNutrition.carbohydrate.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>당류</td><td>{{ totalNutrition.sugar.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>지방</td><td>{{ totalNutrition.fat.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>단백질</td><td>{{ totalNutrition.protein.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>칼슘</td><td>{{ totalNutrition.calcium.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>인</td><td>{{ totalNutrition.phosphorus.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>나트륨</td><td>{{ totalNutrition.sodium.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>칼륨</td><td>{{ totalNutrition.potassium.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>마그네슘</td><td>{{ totalNutrition.magnesium.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>철</td><td>{{ totalNutrition.iron.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>아연</td><td>{{ totalNutrition.zinc.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>콜레스테롤</td><td>{{ totalNutrition.cholesterol.toFixed(2) }}</td>
-              </tr>
-              <tr>
-                <td>트랜스지방</td><td>{{ totalNutrition.trans_fat.toFixed(2) }}</td>
-              </tr>
-          </tbody>
-        </VTable>
-      </div>
-      </v-card-text>
-      <v-card-actions>
-        <v-btn color="green darken-1" @click="closeModal" class="ml-auto">확인</v-btn>
-        <!-- <v-spacer></v-spacer> -->
-      </v-card-actions>
-    </v-card>
+          <!-- tabs content -->
+          <VWindow v-model="navigationTab" style="display: flex;">
+            <VWindowItem style="overflow-y: auto; max-height: 300px; width: 980px;">
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>돈가스</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  58.9<br>
+                        단백질   :  8.7<br>
+                        지방     :  3<br>
+                        총량     :  300.7 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 12시 06분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>양념게장</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  46.3<br>
+                        단백질   :  20.4<br>
+                        지방     :  2<br>
+                        총량     :  275.6 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 02시 10분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>훈제연어</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  9.3<br>
+                        단백질   :  19.3<br>
+                        지방     :  6.2<br>
+                        총량     :  169 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 04시 22분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>닭죽</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  92.5<br>
+                        단백질   :  75.9<br>
+                        지방     :  48.2<br>
+                        총량     :  1181.7 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 09시 39분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              <VCard v-if="navigationTab === 0" class="my-card">
+                <div class="d-flex justify-space-between flex-wrap flex-md-nowrap flex-column flex-md-row">
+                  <div class="ma-auto pa-5">
+                  </div>
+                  <div>
+                    <VCardItem>
+                      <VCardTitle>소고기무국</VCardTitle>
+                    </VCardItem>
+                    <VCardText>
+                      <p class="mb-2">
+                        3대 영양소 <br>
+                        탄수화물 :  8.1<br>
+                        단백질   :  13.5<br>
+                        지방     :  4.7<br>
+                        총량     :  125.2 kcal<br>
+                      </p>
+                      <h6 class="text-base font-weight-medium">
+                        <span class="font-weight-regular">2023년 12월 18일<br></span>
+                        <span class="font-weight-medium">오전 09시 42분</span>
+                      </h6>
+                    </VCardText>
+                  </div>
+                </div>
+              </VCard>
+              
+              <!-- <template v-if="navigationTab === 0">
+                <VCard>
+                  {{ serverData.filter(item => item.mealType === 'morning')[0].ingest_calorie }}
+                </VCard>
+              </template>
+              
+              <template v-else-if="navigationTab === 1">
+                <VCard>
+                  {{ array }}
+                </VCard>
+              </template>
+              
+              <template v-else-if="navigationTab === 2">
+                <VCard>
+                  {{ array }}
+                </VCard>
+              </template> -->
+              <VCardText>
+                <VBtn @click="closeModal">Learn More</VBtn>
+              </VCardText>
+            </VWindowItem>
+          </VWindow>
+        </VCard>
+      </VCol>
+    </VRow>
   </v-dialog>
 </template>
 
 
 
 <style scoped>
-.calendar-container {
-  padding-bottom: 50px !important; /* 원하는 패딩 값으로 조절 */
+.my-card {
+  display: inline-block;
+  margin: 20px; /* 원하는 간격으로 조절하세요 */
 }
 </style>
+ 

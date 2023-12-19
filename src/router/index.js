@@ -1,15 +1,17 @@
 import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
 
-import ChatFixed from '@/pages/recipe/ChatFixed.vue'
-import ChatRecent from '@/pages/recipe/ChatRecent.vue'
-import calorieDetail from '@/pages/calorie/calenderDetail.vue'
+import ChatFixed from '@/pages/recipe/chatFixed.vue'
+import ChatRecent from '@/pages/recipe/chatRecent.vue'
+import refInsert from '@/pages/ref/refInsert.vue'
+import refList from '@/pages/ref/refList.vue'
+
 import routes from '~pages'
 import admin from './admin'
 import jinwoo from './jinwoo'
 import sun from './sun'
 import calorie from './calorie'
-import ref from './ref'
+import notice from './notice'
 
 
 const additionalRoutes = [
@@ -24,21 +26,34 @@ const additionalRoutes = [
     component: ChatFixed,
   },
   {
-    path: '/calorie/calenderdetail',
-    name: 'calorieDetail',
-    component: calorieDetail,
+    path: '/ref/refList',
+    name: 'refList',
+    component: refList,
+    meta : {
+      Layout : setupLayouts
+    },
+  },
+  {
+    path: '/ref/refinsert',
+    name: 'refInsert',
+    component: refInsert,
+    meta : {
+      Layout : setupLayouts
+    },
   },
 ]
 
+// createWebHistory(import.meta.env.BASE_URL),
+
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     ...setupLayouts(routes),
     ...sun,
     ...additionalRoutes,
     ...admin,
     ...calorie,
-    ...ref,
+    ...notice,
   ],
   ...jinwoo,
 })

@@ -122,6 +122,14 @@ const optionSave = async () => {
   }
 }
 
+const deleteMember = () => {
+
+  console.log("deleteMember")
+  axios.patch('/updelete')
+  sessionStorage.clear()
+  router.push("/")
+}
+
 onMounted(() => {
   axios.get('/profile')
     .then(response => {
@@ -304,6 +312,13 @@ const mapActivityToFloat = activity => {
                   @click="next"
                 >
                   다음에 수정
+                </VBtn>
+                <VBtn
+                  color="secondary"
+                  variant="outlined"
+                  @click="deleteMember"
+                >
+                  탈퇴
                 </VBtn>
               </VCol>
             </VRow>

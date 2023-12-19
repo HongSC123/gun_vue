@@ -11,6 +11,9 @@ const axiosIns = axios.create({
   timeout: 100000,
   headers: {
     'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   },
 
   // headers: {'X-Custom-Header': 'foobar'}
@@ -22,10 +25,6 @@ axiosIns.interceptors.request.use(config => {
   const token = sessionStorage.getItem('accessToken')
   const refresh = sessionStorage.getItem('refreshToken')
   const loginType = sessionStorage.getItem('loginType')
-
-  console.log("token value : ", token)
-  console.log("refresh value : ", refresh)
-  console.log("loginType value : ", loginType)
 
   // 토큰이 존재하는 경우
   if (token) {
@@ -52,8 +51,7 @@ axiosIns.interceptors.request.use(config => {
     // 토큰의 로그인 타입을 헤더에 추가합니다.
     
     config.headers['loginType'] = `${loginType}`
-    console.log(config.headers.loginType)
-
+    
   }
 
   // 수정된 구성을 반환합니다.
@@ -81,11 +79,8 @@ axiosIns.interceptors.response.use(
             error: errorCode,
           })
           
-          console.log("accesstoken : ", response.data.accessToken)
-          console.log("refreshToken : ", response.data.refreshToken)
 
           if(response.data.error != null){
-            console.log("error", response.data.error)
             
             return Promise.reject(refreshError)
           }
@@ -99,14 +94,11 @@ axiosIns.interceptors.response.use(
           
           return axios(error.config)
         } catch (refreshError) {
-          console.error('토큰 갱신 실패:', refreshError)
 
           return Promise.reject(refreshError)
         }
       })()
     }else if(error.response.status === 703) {
-
-      console.log("login 다시")
       router.push('/login')
 
     }else {
